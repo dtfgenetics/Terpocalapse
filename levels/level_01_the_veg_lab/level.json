@@ -1,0 +1,90 @@
+{
+  "id": "level_01_the_veg_lab",
+  "title": "The Veg Lab",
+  "status": "planning",
+  "purpose": "First playable vertical-slice level for Terpocalypse.",
+  "playerStart": {
+    "room": "start_room",
+    "x": 2,
+    "y": 2,
+    "rotation": 90
+  },
+  "objectives": [
+    "Find the pH Blaster",
+    "Clear the first pest encounter",
+    "Collect the green keycard",
+    "Open the green door",
+    "Reach the exit chamber"
+  ],
+  "rooms": [
+    {
+      "id": "start_room",
+      "name": "Start Room",
+      "purpose": "Safe space for player orientation and first weapon pickup.",
+      "enemies": [],
+      "pickups": ["ph_blaster"],
+      "props": ["grow_light", "warning_sign"]
+    },
+    {
+      "id": "grow_light_corridor",
+      "name": "Grow-Light Corridor",
+      "purpose": "First movement corridor and first enemy introduction.",
+      "enemies": ["spider_mite_swarm"],
+      "pickups": [],
+      "props": ["grow_light", "irrigation_pipe"]
+    },
+    {
+      "id": "first_pest_room",
+      "name": "First Pest Room",
+      "purpose": "Small combat room teaching swarm pressure.",
+      "enemies": ["spider_mite_swarm", "spider_mite_swarm"],
+      "pickups": ["cure_jar_health"],
+      "props": ["clone_tray", "fan"]
+    },
+    {
+      "id": "nutrient_storage",
+      "name": "Nutrient Storage",
+      "purpose": "Introduces medium enemy and ammo pickup.",
+      "enemies": ["powdery_mildew_ghoul"],
+      "pickups": ["light_ammo_box"],
+      "props": ["nutrient_tank", "lab_crate"]
+    },
+    {
+      "id": "green_keycard_room",
+      "name": "Green Keycard Room",
+      "purpose": "Gives the player the key needed for the first locked door.",
+      "enemies": [],
+      "pickups": ["green_keycard"],
+      "props": ["keycard_reader_panel", "warning_sign"]
+    },
+    {
+      "id": "secret_stash_room",
+      "name": "Secret Stash Room",
+      "purpose": "Optional reward space teaching secrets.",
+      "secret": true,
+      "enemies": [],
+      "pickups": ["kief_armor"],
+      "props": ["cure_jar_shelf"]
+    },
+    {
+      "id": "exit_chamber",
+      "name": "Exit Chamber",
+      "purpose": "Final first-level combat check and exit.",
+      "enemies": ["nute_burn_imp"],
+      "pickups": [],
+      "props": ["exit_switch", "warning_sign"]
+    }
+  ],
+  "lockedDoors": [
+    {
+      "id": "green_door_01",
+      "requires": "green_keycard",
+      "connects": ["green_keycard_room", "exit_chamber"]
+    }
+  ],
+  "winCondition": {
+    "type": "reach_exit",
+    "target": "exit_chamber"
+  },
+  "notes": "This is a planning JSON scaffold, not an engine-ready final map yet."
+}
