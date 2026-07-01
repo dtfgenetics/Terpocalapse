@@ -39,10 +39,15 @@ export function paint(ctx, canvas, state, level) {
   ctx.fill();
 
   const activeThreats = (state.threats || []).filter((threat) => !threat.cleared).length;
+  const equipped = state.tools?.equipped || "trim_shears";
+  const equippedLabel = equipped.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+  const ammo = state.ammo || {};
 
   ctx.fillStyle = "#7cff5b";
   ctx.font = "20px monospace";
-  ctx.fillText("Terpocalypse V2", 24, canvas.height - 174);
+  ctx.fillText("Terpocalypse V2", 24, canvas.height - 230);
+  ctx.fillText("Tool " + equippedLabel, 24, canvas.height - 202);
+  ctx.fillText("Ammo L" + (ammo.light || 0) + " H" + (ammo.heavy || 0) + " F" + (ammo.fuel || 0) + " G" + (ammo.grenade || 0), 24, canvas.height - 174);
   ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor, 24, canvas.height - 146);
   ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 118);
   ctx.fillText("Threats " + activeThreats + "  Cleared " + state.stats.cleared, 24, canvas.height - 90);
