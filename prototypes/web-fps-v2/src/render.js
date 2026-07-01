@@ -1,3 +1,5 @@
+import { buildHudLines } from "./hud-lines.js";
+
 export function fitCanvas(canvas) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -48,27 +50,22 @@ export function paint(ctx, canvas, state, level) {
   ctx.arc(30 + (state.player.x / level.tileSize) * size, 30 + (state.player.y / level.tileSize) * size, 4, 0, Math.PI * 2);
   ctx.fill();
 
-  const activeThreats = (state.threats || []).filter((threat) => !threat.cleared).length;
-  const equipped = state.tools?.equipped || "trim_shears";
-  const equippedLabel = equipped.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
-  const ammo = state.ammo || {};
-  const progress = state.progress?.labels?.[state.progress.current] || "Reach the exit chamber";
-
-  ctx.fillStyle = "#7cff5b";
-  ctx.font = "20px monospace";
-  ctx.fillText("Terpocalypse V2", 24, canvas.height - 286);
-  ctx.fillText("Goal " + progress, 24, canvas.height - 258);
-  ctx.fillText("Tool " + equippedLabel, 24, canvas.height - 230);
-  ctx.fillText("Ammo L" + (ammo.light || 0) + " H" + (ammo.heavy || 0) + " F" + (ammo.fuel || 0) + " G" + (ammo.grenade || 0), 24, canvas.height - 202);
-  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor + "  Special " + (state.player.special || 0), 24, canvas.height - 174);
-  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 146);
-  ctx.fillText("Threats " + activeThreats + "  Cleared " + state.stats.cleared, 24, canvas.height - 118);
-  ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 90);
-  ctx.fillText("Mouse: " + (state.pointerLocked ? "LOCKED" : "CLICK CANVAS"), 24, canvas.height - 62);
-  ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
-  ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
+  drawHudLines(ctx, canvas, state, level);
 
   if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
+}
+
+function drawHudLines(ctx, canvas, state, level) {
+  const lines = buildHudLines(state);
+  ctx.fillStyle = "#7cff5b";
+  ctx.font = "20px monospace";
+  let y = canvas.height - 286;
+  for (const line of lines) {
+    ctx.fillText(line, 24, y);
+    y += 28;
+  }
+  ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
+  ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
 }
 
 function drawStoryPanel(ctx, canvas, panel) {
