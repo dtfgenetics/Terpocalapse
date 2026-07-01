@@ -7,6 +7,7 @@ import { interact } from "./action-system.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
+import { activateSpecial } from "./special-system.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
@@ -58,6 +59,7 @@ window.addEventListener("keydown", (event) => {
   if (state.storyPanel) return;
   if (event.code === "Space") useEquippedTool(state, threats);
   if (event.code === "KeyF") interact(state, LEVEL);
+  if (event.code === "KeyR") activateSpecial(state, threats);
   if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
