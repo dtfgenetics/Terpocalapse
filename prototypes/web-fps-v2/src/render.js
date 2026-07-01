@@ -1,4 +1,5 @@
 import { buildHudLines } from "./hud-lines.js";
+import { drawWallView } from "./wall-view.js";
 
 export function fitCanvas(canvas) {
   canvas.width = window.innerWidth;
@@ -6,8 +7,7 @@ export function fitCanvas(canvas) {
 }
 
 export function paint(ctx, canvas, state, level) {
-  ctx.fillStyle = "#020503";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawWallView(ctx, canvas, state, level);
 
   if (state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
     ctx.fillStyle = "rgba(255, 95, 126, 0.16)";
