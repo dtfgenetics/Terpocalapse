@@ -1,0 +1,99 @@
+import { THREAT_BALANCE } from "./threat-balance.js";
+
+export const THREAT_COLORS = {
+  spider_mite_swarm: "#d94833",
+  powdery_mildew_ghoul: "#dfe7df",
+  nute_burn_sprayer: "#ff8c2f",
+  root_rot_crawler: "#7a5f45",
+  bud_rot_brute: "#8a6f57",
+  compliance_drone: "#70c7ff",
+  aphid_queen: "#b36bff",
+  mold_mother: "#ffffff"
+};
+
+export function createThreats(level, spawnPlan) {
+  const ids = [...(spawnPlan?.threats || [])];
+  const tiles = findOpenTilesFromEnd(level);
+
+  return ids.map((id, index) => {
+    const tile = tiles[index] || { x: 1 + index, y: 1 };
+    const balance = THREAT_BALANCE[id] || { health: 50, speed: 30, pressure: 5, range: 40, points: 100 };
+    return {
+      id: `${id}_${index}`,
+      type: id,
+      name: titleize(id),
+      x: (tile.x + 0.5) * level.tileSize,
+      y: (tile.y + 0.5) * level.tileSize,
+      health: balance.health,
+      maxHealth: balance.health,
+      speed: balance.speed,
+      pressure: balance.pressure,
+      range: balance.range,
+      points: balance.points,
+      color: THREAT_COLORS[id] || "#ff8c2f",
+      cleared: false,
+      lastPressureAt: 0
+    };
+  });
+}
+
+export function updateThreats(state, level, threats, dt, now = performance.now()) {
+  if (state.mode !== "running") return;
+  for (const threat of threats) {
+    if (threat.cleared) continue;
+    const dx = state.player.x - threat.x;
+    const dy = state.player.y - threat.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > threat.range && dist < level.tileSize * 7) {
+      const step = Math.min(threat.speed * dt, dist);
+      threat.x += (dx / dist) * step;
+      threat.y += (dy / dist) * step;
+    }
+
+    if (dist <= threat.range && now - threat.lastPressureAt > 800) {
+      threat.lastPressureAt = now;
+      state.player.hp = Math.max(0, state.player.hp - threat.pressure);
+      state.message = `${threat.name} pressure!`;
+      if (state.player.hp <= 0) {
+        state.mode = "failed";
+        state.message = "Run failed. The facility pushed back too hard.";
+      }
+    }
+  }
+}
+
+export function clearNearestThreat(state, threats, radius = 55) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const threat of threats) {
+    if (threat.cleared) continue;
+    const dist = Math.hypot(threat.x - state.player.x, threat.y - state.player.y);
+    if (dist < radius && dist < bestDist) {
+      best = threat;
+      bestDist = dist;
+    }
+  }
+
+  if (!best) return null;
+  best.health = 0;
+  best.cleared = true;
+  state.stats.cleared += 1;
+  state.player.score += best.points;
+  state.message = `${best.name} cleared.`;
+  return best;
+}
+
+function findOpenTilesFromEnd(level) {
+  const tiles = [];
+  for (let y = level.map.length - 2; y > 0; y -= 1) {
+    for (let x = level.map[y].length - 2; x > 0; x -= 1) {
+      if (level.map[y][x] === ".") tiles.push({ x, y });
+    }
+  }
+  return tiles;
+}
+
+function titleize(id) {
+  return id.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+}
