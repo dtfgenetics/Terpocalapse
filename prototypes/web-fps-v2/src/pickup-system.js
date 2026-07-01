@@ -75,7 +75,7 @@ function applyPickup(state, pickup) {
   if (pickup.id.endsWith("keycard")) {
     const key = pickup.id.split("_")[0];
     state.inventory.keys[key] = true;
-    if (key === "green") state.keyOpen = true;
+    state.keyOpen = true;
     state.message = `${pickup.name} ready.`;
     return;
   }
