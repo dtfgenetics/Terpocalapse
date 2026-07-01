@@ -2,6 +2,7 @@ import { buildHudLines } from "./hud-lines.js";
 import { drawWallView } from "./wall-view.js";
 import { projectWorldPoint } from "./projection-math.js";
 import { allowFlashes } from "./display-preferences.js";
+import { gateIsOpen } from "./gate-map.js";
 
 export function fitCanvas(canvas) {
   canvas.width = window.innerWidth;
@@ -39,7 +40,8 @@ function drawDebugMap(ctx, state, level) {
   for (let y = 0; y < level.map.length; y += 1) {
     for (let x = 0; x < level.map[y].length; x += 1) {
       const cell = level.map[y][x];
-      ctx.fillStyle = cell === "#" ? "#24482f" : cell === "D" ? "#7cff5b" : cell === "K" ? "#17351d" : cell === "X" ? "#ffc857" : "#111";
+      const openGate = cell === "D" && gateIsOpen(state.gates || [], x, y);
+      ctx.fillStyle = cell === "#" ? "#24482f" : openGate ? "#102414" : cell === "D" ? "#7cff5b" : cell === "K" ? "#17351d" : cell === "X" ? "#ffc857" : "#111";
       ctx.fillRect(30 + x * size, 30 + y * size, size - 1, size - 1);
     }
   }
