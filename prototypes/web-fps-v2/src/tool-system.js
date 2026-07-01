@@ -1,4 +1,5 @@
 import { GEAR_BALANCE } from "./gear-balance.js";
+import { addLine, addPulse } from "./effect-system.js";
 
 export function createToolState(loadout) {
   const tools = [...(loadout?.tools || ["trim_shears"])]
@@ -40,12 +41,17 @@ export function useEquippedTool(state, threats, now = performance.now()) {
 
   state.tools.lastUseAt = now;
   state.stats.shots = (state.stats.shots || 0) + 1;
+  state.effects = state.effects || [];
 
   const target = findNearestThreat(state, threats, balance.reach);
   if (!target) {
+    addPulse(state.effects, state.player.x, state.player.y, "#7cff5b", 120);
     state.message = `${formatToolName(toolId)} used.`;
     return null;
   }
+
+  addLine(state.effects, state.player.x, state.player.y, target.x, target.y, "#7cff5b", 160);
+  addPulse(state.effects, target.x, target.y, target.color || "#ffffff", 220);
 
   const hitCount = Math.max(1, balance.spread || 1);
   const damage = balance.power * hitCount;
