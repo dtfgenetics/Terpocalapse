@@ -45,6 +45,8 @@ export function paint(ctx, canvas, state, level) {
     ctx.fillRect(30 + (threat.x / level.tileSize) * size - 4, 30 + (threat.y / level.tileSize) * size - 4, 8, 8);
   }
 
+  drawMapEffects(ctx, state, level, size);
+
   ctx.fillStyle = "#fff";
   ctx.beginPath();
   ctx.arc(30 + (state.player.x / level.tileSize) * size, 30 + (state.player.y / level.tileSize) * size, 4, 0, Math.PI * 2);
@@ -53,6 +55,24 @@ export function paint(ctx, canvas, state, level) {
   drawHudLines(ctx, canvas, state, level);
 
   if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
+}
+
+function drawMapEffects(ctx, state, level, size) {
+  for (const effect of state.effects || []) {
+    ctx.strokeStyle = effect.color || "#ffffff";
+    ctx.lineWidth = 2;
+    if (effect.type === "line") {
+      ctx.beginPath();
+      ctx.moveTo(30 + (effect.fromX / level.tileSize) * size, 30 + (effect.fromY / level.tileSize) * size);
+      ctx.lineTo(30 + (effect.toX / level.tileSize) * size, 30 + (effect.toY / level.tileSize) * size);
+      ctx.stroke();
+    }
+    if (effect.type === "pulse") {
+      ctx.beginPath();
+      ctx.arc(30 + (effect.x / level.tileSize) * size, 30 + (effect.y / level.tileSize) * size, 7, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
 }
 
 function drawHudLines(ctx, canvas, state, level) {
