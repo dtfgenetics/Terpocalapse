@@ -14,9 +14,17 @@ export function paint(ctx, canvas, state, level) {
   for (let y = 0; y < level.map.length; y += 1) {
     for (let x = 0; x < level.map[y].length; x += 1) {
       const cell = level.map[y][x];
-      ctx.fillStyle = cell === "#" ? "#24482f" : cell === "D" ? "#7cff5b" : cell === "K" ? "#7cff5b" : cell === "X" ? "#ffc857" : "#111";
+      ctx.fillStyle = cell === "#" ? "#24482f" : cell === "D" ? "#7cff5b" : cell === "K" ? "#17351d" : cell === "X" ? "#ffc857" : "#111";
       ctx.fillRect(30 + x * size, 30 + y * size, size - 1, size - 1);
     }
+  }
+
+  for (const pickup of state.pickups || []) {
+    if (pickup.collected) continue;
+    ctx.fillStyle = pickup.color || "#ffffff";
+    ctx.beginPath();
+    ctx.arc(30 + (pickup.x / level.tileSize) * size, 30 + (pickup.y / level.tileSize) * size, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   ctx.fillStyle = "#fff";
@@ -26,8 +34,9 @@ export function paint(ctx, canvas, state, level) {
 
   ctx.fillStyle = "#7cff5b";
   ctx.font = "20px monospace";
-  ctx.fillText("Terpocalypse V2", 24, canvas.height - 118);
-  ctx.fillText("HP " + state.player.hp + "  Score " + state.player.score, 24, canvas.height - 90);
+  ctx.fillText("Terpocalypse V2", 24, canvas.height - 146);
+  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor, 24, canvas.height - 118);
+  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 90);
   ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 62);
   ctx.fillStyle = state.mode === "complete" ? "#ffc857" : "#ffffff";
   ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
