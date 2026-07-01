@@ -3,6 +3,7 @@ import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { updatePlayerMovement } from "./movement-system.js";
+import { interact } from "./action-system.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
@@ -50,6 +51,7 @@ window.addEventListener("keydown", (event) => {
   }
   if (state.storyPanel) return;
   if (event.code === "Space") useEquippedTool(state, threats);
+  if (event.code === "KeyF") interact(state, LEVEL);
   if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
