@@ -7,6 +7,16 @@ export function paint(ctx, canvas, state, level) {
   ctx.fillStyle = "#020503";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  if (state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
+    ctx.fillStyle = "rgba(255, 95, 126, 0.16)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  if (state.specialFlashUntil && performance.now() < state.specialFlashUntil) {
+    ctx.fillStyle = "rgba(124, 255, 91, 0.12)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   ctx.fillStyle = "#071006";
   ctx.fillRect(20, 20, 220, 180);
 
@@ -45,13 +55,14 @@ export function paint(ctx, canvas, state, level) {
 
   ctx.fillStyle = "#7cff5b";
   ctx.font = "20px monospace";
-  ctx.fillText("Terpocalypse V2", 24, canvas.height - 230);
-  ctx.fillText("Tool " + equippedLabel, 24, canvas.height - 202);
-  ctx.fillText("Ammo L" + (ammo.light || 0) + " H" + (ammo.heavy || 0) + " F" + (ammo.fuel || 0) + " G" + (ammo.grenade || 0), 24, canvas.height - 174);
-  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor, 24, canvas.height - 146);
-  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 118);
-  ctx.fillText("Threats " + activeThreats + "  Cleared " + state.stats.cleared, 24, canvas.height - 90);
-  ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 62);
+  ctx.fillText("Terpocalypse V2", 24, canvas.height - 258);
+  ctx.fillText("Tool " + equippedLabel, 24, canvas.height - 230);
+  ctx.fillText("Ammo L" + (ammo.light || 0) + " H" + (ammo.heavy || 0) + " F" + (ammo.fuel || 0) + " G" + (ammo.grenade || 0), 24, canvas.height - 202);
+  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor + "  Special " + (state.player.special || 0), 24, canvas.height - 174);
+  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 146);
+  ctx.fillText("Threats " + activeThreats + "  Cleared " + state.stats.cleared, 24, canvas.height - 118);
+  ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 90);
+  ctx.fillText("Mouse: " + (state.pointerLocked ? "LOCKED" : "CLICK CANVAS"), 24, canvas.height - 62);
   ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
   ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
 
