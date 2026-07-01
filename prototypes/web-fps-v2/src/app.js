@@ -6,6 +6,7 @@ import { safeMove, getMapCell } from "./map.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
+import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
@@ -30,6 +31,8 @@ state.ammo = { ...STARTING_LOADOUT.ammo };
 state.tools = createToolState(STARTING_LOADOUT);
 state.pickups = pickups;
 state.threats = threats;
+state.storyPanel = createIntroPanel();
+state.pendingBriefing = createBriefingPanel(LEVEL.name, loadedLevel.briefing);
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
@@ -41,18 +44,41 @@ state.player.special = STARTING_LOADOUT.special;
 window.addEventListener("resize", () => fitCanvas(canvas));
 window.addEventListener("keydown", (event) => {
   keys.add(event.code);
+  if (event.code === "Enter" && state.storyPanel) {
+    advanceStoryPanel();
+    return;
+  }
+  if (state.storyPanel) return;
   if (event.code === "Space") useEquippedTool(state, threats);
   if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
 
 startButton.addEventListener("click", () => {
-  startRun(state);
   menu.classList.add("hidden");
-  state.message = state.story?.entry || loadedLevel.briefing;
+  state.storyPanel = state.pendingBriefing;
 });
 
+function advanceStoryPanel() {
+  if (state.storyPanel?.type === "intro") {
+    state.storyPanel = state.pendingBriefing;
+    return;
+  }
+  if (state.storyPanel?.type === "briefing") {
+    state.storyPanel = null;
+    startRun(state);
+    state.message = state.story?.entry || loadedLevel.briefing;
+    return;
+  }
+  if (state.storyPanel?.type === "lore") {
+    state.storyPanel = null;
+    state.message = "Lore note saved.";
+    return;
+  }
+}
+
 function update(dt, now) {
+  if (state.storyPanel) return;
   if (state.mode !== "running") return;
   const speed = PLAYER_DEFAULTS.moveSpeed * dt;
   let dx = 0;
@@ -65,6 +91,7 @@ function update(dt, now) {
 
   const collected = collectNearbyPickups(state, pickups);
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
+  if (collected?.id?.startsWith("note_")) state.storyPanel = createLorePanel(collected.id);
 
   updateThreats(state, LEVEL, threats, dt, now);
 
@@ -72,6 +99,7 @@ function update(dt, now) {
   if (cell === "X") {
     state.mode = "complete";
     state.message = state.story?.exit || "Mission complete. The route is secured.";
+    state.storyPanel = createEndingPanel();
   }
   updateClock(state);
 }
