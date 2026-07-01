@@ -54,4 +54,55 @@ export function paint(ctx, canvas, state, level) {
   ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 62);
   ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
   ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
+
+  if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
+}
+
+function drawStoryPanel(ctx, canvas, panel) {
+  const width = Math.min(canvas.width - 80, 820);
+  const height = Math.min(canvas.height - 80, 360);
+  const x = (canvas.width - width) / 2;
+  const y = (canvas.height - height) / 2;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.86)";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "#7cff5b";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.fillStyle = "#ffc857";
+  ctx.font = "28px monospace";
+  ctx.fillText(panel.title, x + 28, y + 48);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "18px monospace";
+  let lineY = y + 92;
+  for (const line of panel.lines || []) {
+    for (const wrapped of wrapText(ctx, line, width - 56)) {
+      ctx.fillText(wrapped, x + 28, lineY);
+      lineY += 26;
+    }
+    lineY += 8;
+  }
+
+  ctx.fillStyle = "#7cff5b";
+  ctx.font = "16px monospace";
+  ctx.fillText(panel.hint || "Press Enter", x + 28, y + height - 28);
+}
+
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const test = current ? current + " " + word : word;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
 }
