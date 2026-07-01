@@ -1,4 +1,5 @@
 import { unlockTool } from "./tool-system.js";
+import { addSpecialCharge } from "./special-system.js";
 
 export const PICKUP_COLORS = {
   green_keycard: "#7cff5b",
@@ -92,6 +93,11 @@ function applyPickup(state, pickup) {
     state.inventory.keys[key] = true;
     state.keyOpen = true;
     state.message = `${pickup.name} ready.`;
+    return;
+  }
+
+  if (pickup.id === "grow_light_overdrive") {
+    addSpecialCharge(state, 45);
     return;
   }
 
