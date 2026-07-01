@@ -28,13 +28,13 @@ node tools/validate-game-data.mjs
 
 This checks map shape, boundaries, entity placement, weapon data, and enemy data.
 
-## Audit Project Files
+## Check Required Files
 
 ```bash
-node tools/project-audit.mjs
+node tools/check-required-files.mjs
 ```
 
-This checks that required prototype files exist and scans for forbidden commercial-shooter terms.
+This confirms the required prototype files are present.
 
 ## Manual Browser QA
 
