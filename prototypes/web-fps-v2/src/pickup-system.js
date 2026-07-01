@@ -16,7 +16,8 @@ export const PICKUP_COLORS = {
   co2_burst_rifle: "#70c7ff",
   terp_torch: "#ff8c2f",
   rosin_railgun: "#ffc857",
-  trichome_reaper: "#ffffff"
+  trichome_reaper: "#ffffff",
+  lore_note: "#ffffff"
 };
 
 const MARKER_PREFS = {
@@ -31,7 +32,7 @@ const AMMO_PICKUPS = {
 };
 
 export function createPickups(level, spawnPlan) {
-  const wanted = [...(spawnPlan?.pickups || [])];
+  const wanted = [...(spawnPlan?.pickups || []), ...(spawnPlan?.lore || [])];
   const placed = [];
   const used = new Set();
 
@@ -80,6 +81,12 @@ function applyPickup(state, pickup) {
   state.inventory = state.inventory || { tools: [], keys: {}, items: [] };
   state.ammo = state.ammo || {};
 
+  if (pickup.id.startsWith("note_")) {
+    state.inventory.items.push(pickup.id);
+    state.message = `${pickup.name} found.`;
+    return;
+  }
+
   if (pickup.id.endsWith("keycard")) {
     const key = pickup.id.split("_")[0];
     state.inventory.keys[key] = true;
@@ -122,7 +129,7 @@ function makePickup(level, id, tileX, tileY) {
     name: titleize(id),
     x: (tileX + 0.5) * level.tileSize,
     y: (tileY + 0.5) * level.tileSize,
-    color: PICKUP_COLORS[id] || "#ffffff",
+    color: id.startsWith("note_") ? PICKUP_COLORS.lore_note : PICKUP_COLORS[id] || "#ffffff",
     collected: false
   };
 }
