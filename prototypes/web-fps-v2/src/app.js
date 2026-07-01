@@ -10,6 +10,7 @@ import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
+import { createSoundQueue, queueSound } from "./sound-queue.js";
 import { loadCampaignMemory, rememberScore } from "./campaign-memory.js";
 import { calculateScore } from "./score-calculator.js";
 import { canRunWorld, toggleRunPause } from "./run-state.js";
@@ -40,6 +41,7 @@ state.settings = settings;
 state.memory = loadCampaignMemory();
 state.progress = createProgress(["Find the first supply pickup", "Collect route access", "Reach the exit chamber"]);
 state.effects = createEffectState();
+state.sounds = createSoundQueue();
 state.inventory = { tools: [...STARTING_LOADOUT.tools], keys: { ...STARTING_LOADOUT.keys }, items: [] };
 state.ammo = { ...STARTING_LOADOUT.ammo };
 state.tools = createToolState(STARTING_LOADOUT);
@@ -61,22 +63,34 @@ window.addEventListener("resize", () => fitCanvas(canvas));
 window.addEventListener("keydown", (event) => {
   keys.add(event.code);
   if (event.code === "Enter" && state.storyPanel) {
+    queueSound(state.sounds, "ui_continue");
     advanceStoryPanel();
     return;
   }
   if (event.code === "Escape" && !state.storyPanel) {
+    queueSound(state.sounds, "ui_pause");
     toggleRunPause(state);
     return;
   }
   if (!canRunWorld(state)) return;
-  if (event.code === "Space") useEquippedTool(state, threats);
-  if (event.code === "KeyF") interact(state, LEVEL);
-  if (event.code === "KeyR") activateSpecial(state, threats);
+  if (event.code === "Space") {
+    queueSound(state.sounds, "tool_blaster");
+    useEquippedTool(state, threats);
+  }
+  if (event.code === "KeyF") {
+    queueSound(state.sounds, "route_access");
+    interact(state, LEVEL);
+  }
+  if (event.code === "KeyR") {
+    queueSound(state.sounds, "special_burst");
+    activateSpecial(state, threats);
+  }
   if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
 
 startButton.addEventListener("click", () => {
+  queueSound(state.sounds, "ui_continue");
   menu.classList.add("hidden");
   state.storyPanel = state.pendingBriefing;
 });
@@ -106,7 +120,10 @@ function update(dt, now) {
   updatePlayerMovement({ state, level: LEVEL, keys, dt, moveFn: safeMove });
 
   const collected = collectNearbyPickups(state, pickups);
-  if (collected) advanceProgress(state.progress);
+  if (collected) {
+    queueSound(state.sounds, collected.id?.startsWith("note_") ? "pickup_lore" : collected.id?.endsWith("keycard") ? "pickup_keycard" : "pickup_basic");
+    advanceProgress(state.progress);
+  }
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
   if (collected?.id?.startsWith("note_")) state.storyPanel = createLorePanel(collected.id);
 
@@ -115,6 +132,7 @@ function update(dt, now) {
   const cell = getMapCell(LEVEL, state.player.x, state.player.y);
   if (cell === "X") {
     state.mode = "complete";
+    queueSound(state.sounds, "level_complete");
     rememberScore(state.memory, calculateScore(state));
     state.message = state.story?.exit || "Mission complete. The route is secured.";
     state.storyPanel = createEndingPanel();
