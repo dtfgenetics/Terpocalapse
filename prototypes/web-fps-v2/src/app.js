@@ -8,6 +8,8 @@ import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
+import { loadSettings } from "./settings-system.js";
+import { bindPointerLook } from "./input-system.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
@@ -17,6 +19,7 @@ const ctx = canvas.getContext("2d");
 const loadedLevel = loadLevelByIndex(0);
 const LEVEL = loadedLevel.level;
 const state = createInitialState();
+const settings = loadSettings();
 const pickups = createPickups(LEVEL, loadedLevel.spawnPlan);
 const threats = createThreats(LEVEL, loadedLevel.spawnPlan);
 const keys = new Set();
@@ -27,6 +30,7 @@ state.message = loadedLevel.briefing;
 state.currentLevel = LEVEL.name;
 state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
+state.settings = settings;
 state.inventory = { tools: [...STARTING_LOADOUT.tools], keys: { ...STARTING_LOADOUT.keys }, items: [] };
 state.ammo = { ...STARTING_LOADOUT.ammo };
 state.tools = createToolState(STARTING_LOADOUT);
@@ -41,6 +45,8 @@ state.player.radius = 14;
 state.player.hp = STARTING_LOADOUT.health;
 state.player.armor = STARTING_LOADOUT.armor;
 state.player.special = STARTING_LOADOUT.special;
+
+bindPointerLook({ canvas, state, settings });
 
 window.addEventListener("resize", () => fitCanvas(canvas));
 window.addEventListener("keydown", (event) => {
