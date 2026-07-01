@@ -1,5 +1,6 @@
 import { buildHudLines } from "./hud-lines.js";
 import { drawWallView } from "./wall-view.js";
+import { projectWorldPoint } from "./projection-math.js";
 
 export function fitCanvas(canvas) {
   canvas.width = window.innerWidth;
@@ -8,6 +9,7 @@ export function fitCanvas(canvas) {
 
 export function paint(ctx, canvas, state, level) {
   drawWallView(ctx, canvas, state, level);
+  drawProjectedMarkers(ctx, canvas, state);
 
   if (state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
     ctx.fillStyle = "rgba(255, 95, 126, 0.16)";
@@ -55,6 +57,20 @@ export function paint(ctx, canvas, state, level) {
   drawHudLines(ctx, canvas, state, level);
 
   if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
+}
+
+function drawProjectedMarkers(ctx, canvas, state) {
+  const items = [];
+  for (const pickup of state.pickups || []) if (!pickup.collected) items.push(pickup);
+  for (const threat of state.threats || []) if (!threat.cleared) items.push(threat);
+  items.sort((a, b) => Math.hypot(b.x - state.player.x, b.y - state.player.y) - Math.hypot(a.x - state.player.x, a.y - state.player.y));
+  for (const item of items) {
+    const projected = projectWorldPoint(state, canvas, item.x, item.y);
+    if (!projected) continue;
+    const size = Math.max(8, Math.min(80, projected.size));
+    ctx.fillStyle = item.color || "#ffffff";
+    ctx.fillRect(projected.screenX - size / 2, projected.screenY - size / 2, size, size);
+  }
 }
 
 function drawMapEffects(ctx, state, level, size) {
