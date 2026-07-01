@@ -1,3 +1,5 @@
+import { unlockTool } from "./tool-system.js";
+
 export const PICKUP_COLORS = {
   green_keycard: "#7cff5b",
   purple_keycard: "#b36bff",
@@ -21,6 +23,11 @@ const MARKER_PREFS = {
   K: ["green_keycard", "purple_keycard", "gold_keycard"],
   A: ["kief_armor"],
   S: ["grow_light_overdrive", "rare_seed_pack", "golden_nug"]
+};
+
+const AMMO_PICKUPS = {
+  light_ammo_box: { type: "light", amount: 24 },
+  heavy_ammo_box: { type: "heavy", amount: 8 }
 };
 
 export function createPickups(level, spawnPlan) {
@@ -71,6 +78,7 @@ function applyPickup(state, pickup) {
   state.stats.pickups += 1;
   state.message = `${pickup.name} collected.`;
   state.inventory = state.inventory || { tools: [], keys: {}, items: [] };
+  state.ammo = state.ammo || {};
 
   if (pickup.id.endsWith("keycard")) {
     const key = pickup.id.split("_")[0];
@@ -80,13 +88,32 @@ function applyPickup(state, pickup) {
     return;
   }
 
+  if (AMMO_PICKUPS[pickup.id]) {
+    const ammo = AMMO_PICKUPS[pickup.id];
+    state.ammo[ammo.type] = (state.ammo[ammo.type] || 0) + ammo.amount;
+    state.message = `${pickup.name} loaded.`;
+    return;
+  }
+
   if (pickup.id.includes("health")) state.player.hp = Math.min(100, state.player.hp + 25);
   if (pickup.id.includes("armor")) state.player.armor = Math.min(100, state.player.armor + 25);
-  if (pickup.id.includes("blaster") || pickup.id.includes("cannon") || pickup.id.includes("rifle") || pickup.id.includes("torch") || pickup.id.includes("railgun") || pickup.id.includes("reaper")) {
+
+  if (isToolPickup(pickup.id)) {
     if (!state.inventory.tools.includes(pickup.id)) state.inventory.tools.push(pickup.id);
+    unlockTool(state, pickup.id);
   } else {
     state.inventory.items.push(pickup.id);
   }
+}
+
+function isToolPickup(id) {
+  return id.includes("blaster") ||
+    id.includes("cannon") ||
+    id.includes("rifle") ||
+    id.includes("torch") ||
+    id.includes("railgun") ||
+    id.includes("reaper") ||
+    id.includes("grenades");
 }
 
 function makePickup(level, id, tileX, tileY) {
