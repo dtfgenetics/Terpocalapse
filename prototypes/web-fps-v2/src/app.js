@@ -10,6 +10,7 @@ import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
+import { canRunWorld } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
@@ -60,7 +61,7 @@ window.addEventListener("keydown", (event) => {
     advanceStoryPanel();
     return;
   }
-  if (state.storyPanel) return;
+  if (!canRunWorld(state)) return;
   if (event.code === "Space") useEquippedTool(state, threats);
   if (event.code === "KeyF") interact(state, LEVEL);
   if (event.code === "KeyR") activateSpecial(state, threats);
@@ -93,8 +94,7 @@ function advanceStoryPanel() {
 
 function update(dt, now) {
   pruneEffects(state.effects, now);
-  if (state.storyPanel) return;
-  if (state.mode !== "running") return;
+  if (!canRunWorld(state)) return;
 
   updatePlayerMovement({ state, level: LEVEL, keys, dt, moveFn: safeMove });
 
