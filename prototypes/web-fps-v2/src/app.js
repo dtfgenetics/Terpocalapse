@@ -1,9 +1,11 @@
 import { PLAYER_DEFAULTS } from "./data.js";
+import { STARTING_LOADOUT } from "./player-loadout.js";
 import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
-import { createThreats, updateThreats, clearNearestThreat } from "./threat-system.js";
+import { createThreats, updateThreats } from "./threat-system.js";
+import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
@@ -23,21 +25,24 @@ state.message = loadedLevel.briefing;
 state.currentLevel = LEVEL.name;
 state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
-state.inventory = { tools: [], keys: {}, items: [] };
+state.inventory = { tools: [...STARTING_LOADOUT.tools], keys: { ...STARTING_LOADOUT.keys }, items: [] };
+state.ammo = { ...STARTING_LOADOUT.ammo };
+state.tools = createToolState(STARTING_LOADOUT);
 state.pickups = pickups;
 state.threats = threats;
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
 state.player.radius = PLAYER_DEFAULTS.radius;
-state.player.hp = PLAYER_DEFAULTS.hp;
-state.player.armor = PLAYER_DEFAULTS.armor;
-state.player.special = PLAYER_DEFAULTS.special;
+state.player.hp = STARTING_LOADOUT.health;
+state.player.armor = STARTING_LOADOUT.armor;
+state.player.special = STARTING_LOADOUT.special;
 
 window.addEventListener("resize", () => fitCanvas(canvas));
 window.addEventListener("keydown", (event) => {
   keys.add(event.code);
-  if (event.code === "Space") clearNearestThreat(state, threats);
+  if (event.code === "Space") useEquippedTool(state, threats);
+  if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
 
