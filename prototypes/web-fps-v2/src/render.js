@@ -27,17 +27,26 @@ export function paint(ctx, canvas, state, level) {
     ctx.fill();
   }
 
+  for (const threat of state.threats || []) {
+    if (threat.cleared) continue;
+    ctx.fillStyle = threat.color || "#ff8c2f";
+    ctx.fillRect(30 + (threat.x / level.tileSize) * size - 4, 30 + (threat.y / level.tileSize) * size - 4, 8, 8);
+  }
+
   ctx.fillStyle = "#fff";
   ctx.beginPath();
   ctx.arc(30 + (state.player.x / level.tileSize) * size, 30 + (state.player.y / level.tileSize) * size, 4, 0, Math.PI * 2);
   ctx.fill();
 
+  const activeThreats = (state.threats || []).filter((threat) => !threat.cleared).length;
+
   ctx.fillStyle = "#7cff5b";
   ctx.font = "20px monospace";
-  ctx.fillText("Terpocalypse V2", 24, canvas.height - 146);
-  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor, 24, canvas.height - 118);
-  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 90);
+  ctx.fillText("Terpocalypse V2", 24, canvas.height - 174);
+  ctx.fillText("HP " + state.player.hp + "  Armor " + state.player.armor, 24, canvas.height - 146);
+  ctx.fillText("Score " + state.player.score + "  Pickups " + state.stats.pickups, 24, canvas.height - 118);
+  ctx.fillText("Threats " + activeThreats + "  Cleared " + state.stats.cleared, 24, canvas.height - 90);
   ctx.fillText("Keycard: " + (state.keyOpen ? "READY" : "NEEDED"), 24, canvas.height - 62);
-  ctx.fillStyle = state.mode === "complete" ? "#ffc857" : "#ffffff";
+  ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
   ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
 }
