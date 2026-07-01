@@ -3,6 +3,7 @@ import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
+import { createThreats, updateThreats, clearNearestThreat } from "./threat-system.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
@@ -13,6 +14,7 @@ const loadedLevel = loadLevelByIndex(0);
 const LEVEL = loadedLevel.level;
 const state = createInitialState();
 const pickups = createPickups(LEVEL, loadedLevel.spawnPlan);
+const threats = createThreats(LEVEL, loadedLevel.spawnPlan);
 const keys = new Set();
 let last = performance.now();
 
@@ -23,6 +25,7 @@ state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
 state.inventory = { tools: [], keys: {}, items: [] };
 state.pickups = pickups;
+state.threats = threats;
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
@@ -32,7 +35,10 @@ state.player.armor = PLAYER_DEFAULTS.armor;
 state.player.special = PLAYER_DEFAULTS.special;
 
 window.addEventListener("resize", () => fitCanvas(canvas));
-window.addEventListener("keydown", (event) => keys.add(event.code));
+window.addEventListener("keydown", (event) => {
+  keys.add(event.code);
+  if (event.code === "Space") clearNearestThreat(state, threats);
+});
 window.addEventListener("keyup", (event) => keys.delete(event.code));
 
 startButton.addEventListener("click", () => {
@@ -41,7 +47,7 @@ startButton.addEventListener("click", () => {
   state.message = state.story?.entry || loadedLevel.briefing;
 });
 
-function update(dt) {
+function update(dt, now) {
   if (state.mode !== "running") return;
   const speed = PLAYER_DEFAULTS.moveSpeed * dt;
   let dx = 0;
@@ -55,6 +61,8 @@ function update(dt) {
   const collected = collectNearbyPickups(state, pickups);
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
 
+  updateThreats(state, LEVEL, threats, dt, now);
+
   const cell = getMapCell(LEVEL, state.player.x, state.player.y);
   if (cell === "X") {
     state.mode = "complete";
@@ -66,7 +74,7 @@ function update(dt) {
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  update(dt);
+  update(dt, now);
   paint(ctx, canvas, state, LEVEL);
   requestAnimationFrame(frame);
 }
