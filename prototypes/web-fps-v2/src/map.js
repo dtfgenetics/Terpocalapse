@@ -6,6 +6,17 @@ export function getMapCell(level, x, y) {
   return level.map[ty][tx];
 }
 
+export function getTilePoint(level, x, y) {
+  return {
+    tx: Math.floor(x / level.tileSize),
+    ty: Math.floor(y / level.tileSize)
+  };
+}
+
+export function tileKey(tx, ty) {
+  return `${tx},${ty}`;
+}
+
 export function isSolid(level, x, y, keyOpen = false) {
   const cell = getMapCell(level, x, y);
   return cell === "#" || (cell === "D" && !keyOpen);
