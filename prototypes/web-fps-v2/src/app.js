@@ -10,6 +10,8 @@ import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
+import { loadCampaignMemory, rememberScore } from "./campaign-memory.js";
+import { calculateScore } from "./score-calculator.js";
 import { canRunWorld, toggleRunPause } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
@@ -35,6 +37,7 @@ state.currentLevel = LEVEL.name;
 state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
 state.settings = settings;
+state.memory = loadCampaignMemory();
 state.progress = createProgress(["Find the first supply pickup", "Collect route access", "Reach the exit chamber"]);
 state.effects = createEffectState();
 state.inventory = { tools: [...STARTING_LOADOUT.tools], keys: { ...STARTING_LOADOUT.keys }, items: [] };
@@ -112,6 +115,7 @@ function update(dt, now) {
   const cell = getMapCell(LEVEL, state.player.x, state.player.y);
   if (cell === "X") {
     state.mode = "complete";
+    rememberScore(state.memory, calculateScore(state));
     state.message = state.story?.exit || "Mission complete. The route is secured.";
     state.storyPanel = createEndingPanel();
   }
