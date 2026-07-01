@@ -1,8 +1,8 @@
-import { PLAYER_DEFAULTS } from "./data.js";
 import { STARTING_LOADOUT } from "./player-loadout.js";
 import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
+import { updatePlayerMovement } from "./movement-system.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
@@ -36,7 +36,7 @@ state.pendingBriefing = createBriefingPanel(LEVEL.name, loadedLevel.briefing);
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
-state.player.radius = PLAYER_DEFAULTS.radius;
+state.player.radius = 14;
 state.player.hp = STARTING_LOADOUT.health;
 state.player.armor = STARTING_LOADOUT.armor;
 state.player.special = STARTING_LOADOUT.special;
@@ -80,14 +80,8 @@ function advanceStoryPanel() {
 function update(dt, now) {
   if (state.storyPanel) return;
   if (state.mode !== "running") return;
-  const speed = PLAYER_DEFAULTS.moveSpeed * dt;
-  let dx = 0;
-  let dy = 0;
-  if (keys.has("KeyW") || keys.has("ArrowUp")) dy -= speed;
-  if (keys.has("KeyS") || keys.has("ArrowDown")) dy += speed;
-  if (keys.has("KeyA") || keys.has("ArrowLeft")) dx -= speed;
-  if (keys.has("KeyD") || keys.has("ArrowRight")) dx += speed;
-  safeMove(LEVEL, state.player, dx, dy, state.keyOpen);
+
+  updatePlayerMovement({ state, level: LEVEL, keys, dt, moveFn: safeMove });
 
   const collected = collectNearbyPickups(state, pickups);
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
