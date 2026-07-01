@@ -11,6 +11,7 @@ import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
 import { createSoundQueue, queueSound } from "./sound-queue.js";
+import { createSoundPlayer, playQueuedSounds } from "./sound-player.js";
 import { loadCampaignMemory, rememberScore } from "./campaign-memory.js";
 import { calculateScore } from "./score-calculator.js";
 import { canRunWorld, toggleRunPause } from "./run-state.js";
@@ -29,6 +30,7 @@ const state = createInitialState();
 const settings = loadSettings();
 const pickups = createPickups(LEVEL, loadedLevel.spawnPlan);
 const threats = createThreats(LEVEL, loadedLevel.spawnPlan);
+const soundPlayer = createSoundPlayer(settings);
 const keys = new Set();
 let last = performance.now();
 
@@ -144,6 +146,7 @@ function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   update(dt, now);
+  playQueuedSounds(soundPlayer, state.sounds);
   paint(ctx, canvas, state, LEVEL);
   requestAnimationFrame(frame);
 }
