@@ -1,6 +1,7 @@
 import { buildHudLines } from "./hud-lines.js";
 import { drawWallView } from "./wall-view.js";
 import { projectWorldPoint } from "./projection-math.js";
+import { allowFlashes } from "./display-preferences.js";
 
 export function fitCanvas(canvas) {
   canvas.width = window.innerWidth;
@@ -11,12 +12,12 @@ export function paint(ctx, canvas, state, level) {
   drawWallView(ctx, canvas, state, level);
   drawProjectedMarkers(ctx, canvas, state);
 
-  if (state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
+  if (allowFlashes(state.settings) && state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
     ctx.fillStyle = "rgba(255, 95, 126, 0.16)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  if (state.specialFlashUntil && performance.now() < state.specialFlashUntil) {
+  if (allowFlashes(state.settings) && state.specialFlashUntil && performance.now() < state.specialFlashUntil) {
     ctx.fillStyle = "rgba(124, 255, 91, 0.12)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
