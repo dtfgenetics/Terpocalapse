@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Terpocalypse: Grow Room From Hell</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="game" aria-label="Terpocalypse browser FPS prototype"></canvas>
+
+    <div id="overlay" class="overlay">
+      <div class="panel">
+        <p class="eyebrow">THC / Teaching Healthy Cultivation presents</p>
+        <h1>Terpocalypse</h1>
+        <h2>Grow Room From Hell</h2>
+        <p class="copy">
+          Fight through The Veg Lab, collect the green keycard, clear mutated grow-room threats,
+          and reach the exit chamber.
+        </p>
+        <button id="startButton">Start Prototype</button>
+        <p class="controls">
+          WASD move · Mouse turn · Click/Space shoot · 1/2/3 switch weapons · E interact · Q special · Esc pause
+        </p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
