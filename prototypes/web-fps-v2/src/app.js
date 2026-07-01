@@ -10,7 +10,7 @@ import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
-import { canRunWorld } from "./run-state.js";
+import { canRunWorld, toggleRunPause } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
@@ -59,6 +59,10 @@ window.addEventListener("keydown", (event) => {
   keys.add(event.code);
   if (event.code === "Enter" && state.storyPanel) {
     advanceStoryPanel();
+    return;
+  }
+  if (event.code === "Escape" && !state.storyPanel) {
+    toggleRunPause(state);
     return;
   }
   if (!canRunWorld(state)) return;
