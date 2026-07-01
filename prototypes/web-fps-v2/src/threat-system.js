@@ -1,4 +1,5 @@
 import { THREAT_BALANCE } from "./threat-balance.js";
+import { applyPlayerPressure } from "./damage-system.js";
 
 export const THREAT_COLORS = {
   spider_mite_swarm: "#d94833",
@@ -53,12 +54,7 @@ export function updateThreats(state, level, threats, dt, now = performance.now()
 
     if (dist <= threat.range && now - threat.lastPressureAt > 800) {
       threat.lastPressureAt = now;
-      state.player.hp = Math.max(0, state.player.hp - threat.pressure);
-      state.message = `${threat.name} pressure!`;
-      if (state.player.hp <= 0) {
-        state.mode = "failed";
-        state.message = "Run failed. The facility pushed back too hard.";
-      }
+      applyPlayerPressure(state, threat.pressure, threat.name, now);
     }
   }
 }
