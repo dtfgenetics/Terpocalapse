@@ -15,7 +15,7 @@ export function drawWallView(ctx, canvas, state, level) {
   for (let i = 0; i < COLUMNS; i += 1) {
     const t = i / (COLUMNS - 1);
     const angle = state.player.angle - FOV / 2 + t * FOV;
-    const hit = sampleDepth(level, state.player.x, state.player.y, angle);
+    const hit = sampleDepth(level, state.player.x, state.player.y, angle, 900, state);
     const corrected = hit.distance * Math.cos(angle - state.player.angle);
     const wallHeight = wallHeightFromDistance(corrected, level.tileSize, 520, canvas.height);
     const shade = Math.max(38, 180 - corrected * 0.13);
