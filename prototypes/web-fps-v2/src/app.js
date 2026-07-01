@@ -2,6 +2,7 @@ import { PLAYER_DEFAULTS } from "./data.js";
 import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
+import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
@@ -11,6 +12,7 @@ const ctx = canvas.getContext("2d");
 const loadedLevel = loadLevelByIndex(0);
 const LEVEL = loadedLevel.level;
 const state = createInitialState();
+const pickups = createPickups(LEVEL, loadedLevel.spawnPlan);
 const keys = new Set();
 let last = performance.now();
 
@@ -19,6 +21,8 @@ state.message = loadedLevel.briefing;
 state.currentLevel = LEVEL.name;
 state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
+state.inventory = { tools: [], keys: {}, items: [] };
+state.pickups = pickups;
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
@@ -47,12 +51,11 @@ function update(dt) {
   if (keys.has("KeyA") || keys.has("ArrowLeft")) dx -= speed;
   if (keys.has("KeyD") || keys.has("ArrowRight")) dx += speed;
   safeMove(LEVEL, state.player, dx, dy, state.keyOpen);
+
+  const collected = collectNearbyPickups(state, pickups);
+  if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
+
   const cell = getMapCell(LEVEL, state.player.x, state.player.y);
-  if (cell === "K") {
-    state.keyOpen = true;
-    state.stats.pickups = Math.max(state.stats.pickups, 1);
-    state.message = "Green Keycard collected. Door access open.";
-  }
   if (cell === "X") {
     state.mode = "complete";
     state.message = state.story?.exit || "Mission complete. The route is secured.";
