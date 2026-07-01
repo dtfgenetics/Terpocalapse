@@ -9,6 +9,7 @@ import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress } from "./progress-system.js";
+import { createEffectState, pruneEffects } from "./effect-system.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
@@ -34,6 +35,7 @@ state.story = loadedLevel.story;
 state.spawnPlan = loadedLevel.spawnPlan;
 state.settings = settings;
 state.progress = createProgress(["Find the first supply pickup", "Collect route access", "Reach the exit chamber"]);
+state.effects = createEffectState();
 state.inventory = { tools: [...STARTING_LOADOUT.tools], keys: { ...STARTING_LOADOUT.keys }, items: [] };
 state.ammo = { ...STARTING_LOADOUT.ammo };
 state.tools = createToolState(STARTING_LOADOUT);
@@ -90,6 +92,7 @@ function advanceStoryPanel() {
 }
 
 function update(dt, now) {
+  pruneEffects(state.effects, now);
   if (state.storyPanel) return;
   if (state.mode !== "running") return;
 
