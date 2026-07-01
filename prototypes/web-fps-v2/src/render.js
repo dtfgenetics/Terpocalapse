@@ -21,6 +21,16 @@ export function paint(ctx, canvas, state, level) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
+  if (state.settings?.debugMiniMap !== false) {
+    drawDebugMap(ctx, state, level);
+  }
+
+  drawHudLines(ctx, canvas, state, level);
+
+  if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
+}
+
+function drawDebugMap(ctx, state, level) {
   ctx.fillStyle = "#071006";
   ctx.fillRect(20, 20, 220, 180);
 
@@ -53,10 +63,6 @@ export function paint(ctx, canvas, state, level) {
   ctx.beginPath();
   ctx.arc(30 + (state.player.x / level.tileSize) * size, 30 + (state.player.y / level.tileSize) * size, 4, 0, Math.PI * 2);
   ctx.fill();
-
-  drawHudLines(ctx, canvas, state, level);
-
-  if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
 }
 
 function drawProjectedMarkers(ctx, canvas, state) {
