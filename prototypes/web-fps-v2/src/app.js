@@ -1,4 +1,5 @@
-import { LEVEL, PLAYER_DEFAULTS } from "./data.js";
+import { PLAYER_DEFAULTS } from "./data.js";
+import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { fitCanvas, paint } from "./render.js";
@@ -7,12 +8,17 @@ const canvas = document.getElementById("game");
 const menu = document.getElementById("menu");
 const startButton = document.getElementById("startButton");
 const ctx = canvas.getContext("2d");
+const loadedLevel = loadLevelByIndex(0);
+const LEVEL = loadedLevel.level;
 const state = createInitialState();
 const keys = new Set();
 let last = performance.now();
 
 state.keyOpen = false;
-state.message = "Find the Green Keycard.";
+state.message = loadedLevel.briefing;
+state.currentLevel = LEVEL.name;
+state.story = loadedLevel.story;
+state.spawnPlan = loadedLevel.spawnPlan;
 state.player.x = LEVEL.playerStart.x;
 state.player.y = LEVEL.playerStart.y;
 state.player.angle = LEVEL.playerStart.angle;
@@ -28,6 +34,7 @@ window.addEventListener("keyup", (event) => keys.delete(event.code));
 startButton.addEventListener("click", () => {
   startRun(state);
   menu.classList.add("hidden");
+  state.message = state.story?.entry || loadedLevel.briefing;
 });
 
 function update(dt) {
@@ -48,7 +55,7 @@ function update(dt) {
   }
   if (cell === "X") {
     state.mode = "complete";
-    state.message = "Mission complete. The Veg Lab is secured.";
+    state.message = state.story?.exit || "Mission complete. The route is secured.";
   }
   updateClock(state);
 }
