@@ -1,0 +1,54 @@
+name: Terpocalypse Preproduction Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify production-control documents
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            README.md
+            docs/GAME_BIBLE.md
+            docs/ASSET_BIBLE.md
+            docs/NO_DOOM_IP_RULES.md
+            docs/LICENSING_NOTES.md
+            docs/ACCESSIBILITY_REQUIREMENTS.md
+            docs/ENGINE_REQUIREMENTS.md
+            docs/DEPLOYMENT_PLAN.md
+          )
+          for file in "${required[@]}"; do
+            test -s "$file" || { echo "Missing preproduction control: $file" >&2; exit 1; }
+          done
+
+      - name: Reject commercial game archives and obvious ripped-data containers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad="$(find . -type f \( -iname '*.wad' -o -iname '*.iwad' -o -iname '*.pwad' \) -print)"
+          if [[ -n "$bad" ]]; then
+            echo 'Commercial-game/WAD data is prohibited:' >&2
+            echo "$bad" >&2
+            exit 1
+          fi
+
+      - name: Keep status truthful until playable code exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'Asset planning and prototype setup.' README.md
+          grep -Fq 'No playable code has been added yet.' README.md
