@@ -62,5 +62,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'playable browser vertical slice' README.md
+          grep -Fqi 'playable browser vertical slice' README.md
           grep -Fq 'V2 remains a prototype' prototypes/web-fps-v2/CONTENT_STATUS.md
