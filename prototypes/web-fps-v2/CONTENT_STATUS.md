@@ -1,45 +1,47 @@
 # V2 Content Status
 
-## Defined
+## Working now
+
+- modular browser runtime and canvas renderer
+- data-driven level loading and map registry
+- player movement and pointer look
+- tools, ammo and tool switching
+- threat spawning, pursuit, damage and clearing
+- collision-aware threat pursuit around solid walls and closed route doors
+- pickups and route-access key state
+- mission progress and objective state
+- story/briefing/lore/end panels
+- scoring and clear-state flow
+- campaign-memory hooks
+- browser settings and sound cue system
+- automated Node syntax checks and gameplay-system tests
+
+## Defined for expansion
 
 - 9 level plans
-- campaign registry
-- campaign flow
-- player profile
-- player classes
-- starting loadout
-- inventory rules
-- gear list
-- gear balance
-- threat list
-- threat balance
-- pickup list
-- encounter table
-- reward table
-- mission objectives
-- visual palettes
-- room types
-- status effects
-- achievements
-- clear ratings
-- UI screens
-- settings schema
+- campaign registry and campaign flow
+- player profile and classes
+- inventory and gear rules
+- threat and pickup balance data
+- encounter and reward tables
+- visual palettes and room types
+- status effects, achievements and clear ratings
+- UI screens and settings schema
 - score values
 
-## Still needed
+## Still needed before website promotion
 
-- playable maps for all levels
-- real first-person renderer expansion
-- tool switching in V2
-- threat spawning in V2
-- pickup spawning in V2
-- mission objective tracker in V2
-- campaign save data
-- level select screen
-- settings screen
-- final art assets
-- audio assets
+- complete playable-map implementation beyond the current vertical slice
+- expanded first-person renderer/presentation quality
+- mobile/touch gameplay QA and accessibility pass
+- stronger enemy pathfinding around complex geometry
+- full campaign save/continue flow
+- level-select and settings screens
+- final original art assets
+- final original/licensed audio assets
+- human playtesting and difficulty tuning
+- production packaging and DTFSeeds live-route verification
 
 ## Rule
 
-V1 remains the stable playable prototype until V2 matches or exceeds every V1 gameplay feature.
+V2 remains a prototype until it matches or exceeds the earlier playable build and passes the website release gates. New work should strengthen V2 rather than starting another disconnected prototype.
