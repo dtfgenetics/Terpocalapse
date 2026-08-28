@@ -1,5 +1,6 @@
 import { THREAT_BALANCE } from "./threat-balance.js";
 import { applyPlayerPressure } from "./damage-system.js";
+import { safeMove } from "./map.js";
 
 export const THREAT_COLORS = {
   spider_mite_swarm: "#d94833",
@@ -25,6 +26,7 @@ export function createThreats(level, spawnPlan) {
       name: titleize(id),
       x: (tile.x + 0.5) * level.tileSize,
       y: (tile.y + 0.5) * level.tileSize,
+      radius: 12,
       health: balance.health,
       maxHealth: balance.health,
       speed: balance.speed,
@@ -48,8 +50,9 @@ export function updateThreats(state, level, threats, dt, now = performance.now()
 
     if (dist > threat.range && dist < level.tileSize * 7) {
       const step = Math.min(threat.speed * dt, dist);
-      threat.x += (dx / dist) * step;
-      threat.y += (dy / dist) * step;
+      const moveX = (dx / dist) * step;
+      const moveY = (dy / dist) * step;
+      safeMove(level, threat, moveX, moveY, Boolean(state.keyOpen));
     }
 
     if (dist <= threat.range && now - threat.lastPressureAt > 800) {
