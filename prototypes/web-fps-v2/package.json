@@ -1,0 +1,9 @@
+{
+  "name": "terpocalypse-web-fps-v2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/app.js && node --check src/threat-system.js && node --check src/map.js"
+  }
+}
