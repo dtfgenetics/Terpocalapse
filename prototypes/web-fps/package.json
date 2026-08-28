@@ -1,12 +1,16 @@
 {
   "name": "terpocalypse-web-fps-prototype",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Original no-dependency browser FPS prototype for Terpocalypse: Grow Room From Hell.",
+  "description": "Original no-dependency browser FPS vertical slice for Terpocalypse: Grow Room From Hell.",
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 5173",
-    "dev:py": "python -m http.server 5173"
+    "dev:py": "python -m http.server 5173",
+    "test": "node test/mission-core.test.mjs && node test/runtime-smoke.mjs",
+    "check": "node --check src/main-v2.js && node --check src/mission-core.js && node --check src/boot-safe.js && node --check test/browser-smoke.mjs",
+    "verify": "npm run check && npm test",
+    "test:browser": "node test/browser-smoke.mjs"
   },
   "keywords": [
     "retro-fps",

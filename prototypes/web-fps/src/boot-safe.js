@@ -8,7 +8,8 @@ const runtime = {
   audio: new AudioManager(),
   assetCache: {},
   missingAssets: getMissingAssets(),
-  emitGameHubEvent
+  emitGameHubEvent,
+  build: "veg-lab-release-candidate"
 };
 
 window.terpocalypseRuntime = runtime;
@@ -18,6 +19,12 @@ preloadRegisteredAssets().then((loadedAssets) => {
   runtime.missingAssets = getMissingAssets();
   const script = document.createElement("script");
   script.type = "module";
-  script.src = "./src/main.js";
+  script.src = "./src/main-v2.js";
+  document.body.appendChild(script);
+}).catch((error) => {
+  console.error("Terpocalypse asset preload failed", error);
+  const script = document.createElement("script");
+  script.type = "module";
+  script.src = "./src/main-v2.js";
   document.body.appendChild(script);
 });
