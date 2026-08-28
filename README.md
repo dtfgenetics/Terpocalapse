@@ -7,9 +7,9 @@ Original cannabis-themed retro browser FPS for the THC / DTF game hub.
 
 ## Status
 
-Asset planning and prototype setup.
+Playable browser vertical slice plus asset-first production.
 
-The project is currently being structured as an asset-first game production repo before final gameplay code is added. The first goal is a playable browser vertical slice called **The Veg Lab**.
+The canonical repository now includes the current **The Veg Lab** browser vertical slice under `prototypes/web-fps/`. It was reconciled from the DTFSeeds integration build so gameplay code and the dedicated project repository are no longer split across repositories. Future Terpocalypse gameplay work should be developed here first, then packaged into the DTFSeeds public suite.
 
 ## Core Rule
 
@@ -103,14 +103,12 @@ prototypes/
 
 ## Local Development
 
-No playable code has been added yet. Once the web FPS prototype is introduced, local instructions should be added here with exact commands.
+A playable zero-dependency browser prototype is available now. Serve the repository with any static web server and open `prototypes/web-fps/`. The current prototype supports keyboard/mouse and touch controls.
 
-Expected future direction:
+Current browser prototype location:
 
-```bash
-cd prototypes/web-fps
-npm install
-npm run dev
+```text
+prototypes/web-fps/index.html
 ```
 
 ## Asset Workflow
