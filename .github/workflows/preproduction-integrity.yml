@@ -1,4 +1,4 @@
-name: Terpocalypse Preproduction Integrity
+name: Terpocalypse Veg Lab CI
 
 on:
   push:
@@ -13,9 +13,12 @@ permissions:
 jobs:
   integrity:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Verify production-control documents
         shell: bash
@@ -32,10 +35,10 @@ jobs:
             docs/DEPLOYMENT_PLAN.md
           )
           for file in "${required[@]}"; do
-            test -s "$file" || { echo "Missing preproduction control: $file" >&2; exit 1; }
+            test -s "$file" || { echo "Missing production control: $file" >&2; exit 1; }
           done
 
-      - name: Reject commercial game archives and obvious ripped-data containers
+      - name: Reject commercial game archives and ripped-data containers
         shell: bash
         run: |
           set -euo pipefail
@@ -46,9 +49,30 @@ jobs:
             exit 1
           fi
 
-      - name: Keep status truthful until playable code exists
+      - name: Validate Veg Lab game logic and runtime contract
+        working-directory: prototypes/web-fps
+        run: npm run verify
+
+      - name: Verify release-candidate browser shell
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'Asset planning and prototype setup.' README.md
-          grep -Fq 'No playable code has been added yet.' README.md
+          test -s prototypes/web-fps/index.html
+          test -s prototypes/web-fps/styles.css
+          test -s prototypes/web-fps/styles-v2.css
+          test -s prototypes/web-fps/src/main-v2.js
+          test -s prototypes/web-fps/src/mission-core.js
+          grep -Fq 'The Veg Lab' prototypes/web-fps/index.html
+          grep -Fq 'main-v2.js' prototypes/web-fps/src/boot-safe.js
+          grep -Fq 'mobileControls' prototypes/web-fps/index.html
+          grep -Fq 'runSummary' prototypes/web-fps/index.html
+
+      - name: Install Chromium smoke-test dependency
+        working-directory: prototypes/web-fps
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium
+
+      - name: Play through release candidate in Chromium
+        working-directory: prototypes/web-fps
+        run: npm run test:browser
