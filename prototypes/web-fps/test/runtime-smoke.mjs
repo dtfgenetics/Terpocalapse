@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { runPrototypeValidation } from "../src/runtime-checks.js";
 
-const root = resolve(process.cwd(), "prototypes/web-fps");
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, "..");
 const html = await readFile(resolve(root, "index.html"), "utf8");
 const boot = await readFile(resolve(root, "src/boot-safe.js"), "utf8");
 const app = await readFile(resolve(root, "src/main-v2.js"), "utf8");
