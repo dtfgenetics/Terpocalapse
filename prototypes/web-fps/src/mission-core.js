@@ -1,6 +1,6 @@
 export const LEVEL_ID = "level_01_the_veg_lab";
 
-export function getMissionObjectives({ hasGreenKey = false, doorOpen = false, enemiesRemaining = 0 } = {}) {
+export function getMissionObjectives({ hasGreenKey = false, doorOpen = false, enemiesRemaining = 0, extracted = false } = {}) {
   return [
     { id: "keycard", label: "Recover the green keycard", complete: Boolean(hasGreenKey) },
     { id: "door", label: "Unlock the quarantine door", complete: Boolean(doorOpen) },
@@ -9,7 +9,7 @@ export function getMissionObjectives({ hasGreenKey = false, doorOpen = false, en
       label: enemiesRemaining > 0 ? `Clear grow-room threats (${enemiesRemaining} left)` : "Clear grow-room threats",
       complete: enemiesRemaining === 0
     },
-    { id: "extract", label: "Reach the extraction chamber", complete: false }
+    { id: "extract", label: "Reach the extraction chamber", complete: Boolean(extracted) }
   ];
 }
 
