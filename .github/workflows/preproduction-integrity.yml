@@ -1,4 +1,4 @@
-name: Terpocalypse Preproduction Integrity
+name: Terpocalypse Prototype Integrity
 
 on:
   push:
@@ -13,9 +13,12 @@ permissions:
 jobs:
   integrity:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
       - name: Verify production-control documents
         shell: bash
@@ -30,9 +33,12 @@ jobs:
             docs/ACCESSIBILITY_REQUIREMENTS.md
             docs/ENGINE_REQUIREMENTS.md
             docs/DEPLOYMENT_PLAN.md
+            prototypes/web-fps-v2/index.html
+            prototypes/web-fps-v2/src/app.js
+            prototypes/web-fps-v2/package.json
           )
           for file in "${required[@]}"; do
-            test -s "$file" || { echo "Missing preproduction control: $file" >&2; exit 1; }
+            test -s "$file" || { echo "Missing Terpocalypse control/runtime file: $file" >&2; exit 1; }
           done
 
       - name: Reject commercial game archives and obvious ripped-data containers
@@ -46,9 +52,15 @@ jobs:
             exit 1
           fi
 
-      - name: Keep status truthful until playable code exists
+      - name: Validate V2 browser runtime
+        working-directory: prototypes/web-fps-v2
+        run: |
+          npm run check
+          npm test
+
+      - name: Keep release status truthful
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'Asset planning and prototype setup.' README.md
-          grep -Fq 'No playable code has been added yet.' README.md
+          grep -Fq 'playable browser vertical slice' README.md
+          grep -Fq 'V2 remains a prototype' prototypes/web-fps-v2/CONTENT_STATUS.md
