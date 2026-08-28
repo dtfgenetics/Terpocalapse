@@ -46,9 +46,23 @@ jobs:
             exit 1
           fi
 
-      - name: Keep status truthful until playable code exists
+      - name: Validate playable browser vertical slice
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'Asset planning and prototype setup.' README.md
-          grep -Fq 'No playable code has been added yet.' README.md
+          test -s prototypes/web-fps/index.html
+          test -s prototypes/web-fps/main.js
+          test -s prototypes/web-fps/game-data.js
+          test -s prototypes/web-fps/styles.css
+          test -s prototypes/web-fps/visibility-pause-v1.js
+          node --check prototypes/web-fps/main.js
+          node --check prototypes/web-fps/game-data.js
+          node --check prototypes/web-fps/visibility-pause-v1.js
+          grep -Fq 'Playable browser vertical slice plus asset-first production.' README.md
+          grep -Fq 'visibility-pause-v1.js' prototypes/web-fps/index.html
+          grep -Fq "releaseHeldKeyboardControls" prototypes/web-fps/visibility-pause-v1.js
+          grep -Fq "'Space'" prototypes/web-fps/visibility-pause-v1.js
+          if grep -Fq 'No playable code has been added yet.' README.md; then
+            echo 'README still claims the playable prototype does not exist.' >&2
+            exit 1
+          fi
