@@ -1,0 +1,85 @@
+name: Import DTF Vertical Slice
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/import-dtf-vertical-slice.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout canonical Terpocalypse repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch current DTFSeeds playable integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_repo="$RUNNER_TEMP/dtf-master"
+          git clone --depth=1 https://github.com/dtfgenetics/Thc.git "$source_repo"
+          source_dir="$source_repo/site/public-route-patch/games/terpocalypse"
+          test -s "$source_dir/index.html"
+          test -s "$source_dir/main.js"
+          test -s "$source_dir/game-data.js"
+          test -s "$source_dir/styles.css"
+          rm -rf prototypes/web-fps
+          mkdir -p prototypes/web-fps
+          cp -a "$source_dir/." prototypes/web-fps/
+
+      - name: Validate imported browser vertical slice
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check prototypes/web-fps/main.js
+          node --check prototypes/web-fps/game-data.js
+          test -s prototypes/web-fps/index.html
+          test -s prototypes/web-fps/styles.css
+          grep -Fq 'TERPOCALYPSE' prototypes/web-fps/index.html
+          grep -Fq 'LEVEL 01 · THE VEG LAB' prototypes/web-fps/index.html
+
+      - name: Reconcile canonical project status
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('README.md')
+          text = path.read_text()
+          text = text.replace(
+              'Asset planning and prototype setup.\n\nThe project is currently being structured as an asset-first game production repo before final gameplay code is added. The first goal is a playable browser vertical slice called **The Veg Lab**.',
+              'Playable browser vertical slice plus asset-first production.\n\nThe canonical repository now includes the current **The Veg Lab** browser vertical slice under `prototypes/web-fps/`. It was reconciled from the DTFSeeds integration build so gameplay code and the dedicated project repository are no longer split across repositories. Future Terpocalypse gameplay work should be developed here first, then packaged into the DTFSeeds public suite.'
+          )
+          text = text.replace(
+              'No playable code has been added yet. Once the web FPS prototype is introduced, local instructions should be added here with exact commands.\n\nExpected future direction:',
+              'A playable zero-dependency browser prototype is available now. Serve the repository with any static web server and open `prototypes/web-fps/`. The current prototype supports keyboard/mouse and touch controls.\n\nCurrent browser prototype location:'
+          )
+          text = text.replace(
+              '```bash\ncd prototypes/web-fps\nnpm install\nnpm run dev\n```',
+              '```text\nprototypes/web-fps/index.html\n```'
+          )
+          path.write_text(text)
+          PY
+
+      - name: Commit canonical playable prototype
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'DTF Game Sync'
+          git config user.email 'actions@users.noreply.github.com'
+          git add prototypes/web-fps README.md
+          if git diff --cached --quiet; then
+            echo 'Canonical prototype already matches the DTFSeeds integration.'
+            exit 0
+          fi
+          git commit -m 'feat: establish playable Terpocalypse vertical slice'
+          git push origin HEAD:main
