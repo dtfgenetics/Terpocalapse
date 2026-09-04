@@ -10,7 +10,7 @@ import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
 import { activateSpecial } from "./special-system.js";
-import { createProgress, advanceProgress } from "./progress-system.js";
+import { createProgress, advanceProgress, setProgressAtLeast } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
 import { createSoundQueue, queueSound } from "./sound-queue.js";
 import { createSoundPlayer, playQueuedSounds } from "./sound-player.js";
@@ -173,7 +173,7 @@ function update(dt, now) {
   const collected = collectNearbyPickups(state, pickups);
   if (collected) {
     queueSound(state.sounds, collected.id?.startsWith("note_") ? "pickup_lore" : collected.id?.endsWith("keycard") ? "pickup_keycard" : "pickup_basic");
-    advanceProgress(state.progress);
+    updateMissionProgressForPickup(collected);
   }
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
   if (collected?.id?.startsWith("note_")) state.storyPanel = createLorePanel(collected.id);
@@ -182,6 +182,7 @@ function update(dt, now) {
 
   const cell = getMapCell(LEVEL, state.player.x, state.player.y);
   if (cell === "X") {
+    setProgressAtLeast(state.progress, state.progress.labels.length);
     state.mode = "complete";
     queueSound(state.sounds, "level_complete");
     rememberScore(state.memory, calculateScore(state));
@@ -189,6 +190,15 @@ function update(dt, now) {
     state.storyPanel = createEndingPanel();
   }
   updateClock(state);
+}
+
+function updateMissionProgressForPickup(collected) {
+  if (!collected || collected.id?.startsWith("note_")) return;
+  if (collected.id?.endsWith("keycard")) {
+    setProgressAtLeast(state.progress, 2);
+    return;
+  }
+  if (state.progress.current === 0) advanceProgress(state.progress);
 }
 
 function frame(now) {
