@@ -10,10 +10,7 @@ import { listAssetEntries } from "../prototypes/web-fps-v2/src/asset-manifest.js
 const TILE = 64;
 
 function makeLevel(rows) {
-  return {
-    tileSize: TILE,
-    map: rows.map((row) => row.split(""))
-  };
+  return { tileSize: TILE, map: rows.map((row) => row.split("")) };
 }
 
 function center(tx, ty) {
@@ -85,7 +82,8 @@ function center(tx, ty) {
   assert.equal(getEnemyAnimationState({ cleared: true, health: 0 }, now), "death", "cleared threats should use death state");
   assert.equal(getEnemyAnimationState({ cleared: false, health: 10, lastHitAt: 920 }, now), "hit", "recent damage should use hit state");
   assert.equal(getEnemyAnimationState({ cleared: false, health: 10, lastHitAt: 0, lastAttackAt: 900 }, now), "attack", "recent pressure should use attack state");
-  assert.equal(getEnemyAnimationState({ cleared: false, health: 10, lastHitAt: 0, lastAttackAt: 0, speed: 20 }, now), "chase", "moving threats should use chase state");
+  assert.equal(getEnemyAnimationState({ cleared: false, health: 10, lastHitAt: 0, lastAttackAt: 0, lastMoveAt: 900 }, now), "chase", "recent real movement should use chase state");
+  assert.equal(getEnemyAnimationState({ cleared: false, health: 10, lastHitAt: 0, lastAttackAt: 0, lastMoveAt: 0 }, now), "idle", "stationary threats should use idle state");
   assert.equal(getAnimationFrame(560, 4, 140, 0), 0, "animation frames should wrap deterministically");
 }
 
