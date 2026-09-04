@@ -21,12 +21,14 @@ import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPan
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
 import { bindTouchControls } from "./touch-controls.js";
+import { bindHud } from "./hud-dom.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
 const menu = document.getElementById("menu");
 const startButton = document.getElementById("startButton");
 const touchControls = document.getElementById("touchControls");
+const gameHud = document.getElementById("gameHud");
 const ctx = canvas.getContext("2d");
 const loadedLevel = loadLevelByIndex(0);
 const LEVEL = loadedLevel.level;
@@ -35,6 +37,7 @@ const settings = loadSettings();
 const pickups = createPickups(LEVEL, loadedLevel.spawnPlan);
 const threats = createThreats(LEVEL, loadedLevel.spawnPlan);
 const soundPlayer = createSoundPlayer(settings);
+const updateHud = bindHud(gameHud);
 const keys = new Set();
 let last = performance.now();
 
@@ -207,8 +210,10 @@ function frame(now) {
   update(dt, now);
   playQueuedSounds(soundPlayer, state.sounds);
   paint(ctx, canvas, state, LEVEL);
+  updateHud(state);
   requestAnimationFrame(frame);
 }
 
 fitCanvas(canvas);
+updateHud(state);
 requestAnimationFrame(frame);
