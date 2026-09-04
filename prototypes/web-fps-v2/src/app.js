@@ -1,4 +1,5 @@
 import { STARTING_LOADOUT } from "./player-loadout.js";
+import { GEAR_BALANCE } from "./gear-balance.js";
 import { loadLevelByIndex } from "./level-loader.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
@@ -19,11 +20,13 @@ import { canRunWorld, toggleRunPause } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
 import { loadSettings } from "./settings-system.js";
 import { bindPointerLook } from "./input-system.js";
+import { bindTouchControls } from "./touch-controls.js";
 import { fitCanvas, paint } from "./render.js";
 
 const canvas = document.getElementById("game");
 const menu = document.getElementById("menu");
 const startButton = document.getElementById("startButton");
+const touchControls = document.getElementById("touchControls");
 const ctx = canvas.getContext("2d");
 const loadedLevel = loadLevelByIndex(0);
 const LEVEL = loadedLevel.level;
@@ -62,13 +65,23 @@ state.player.armor = STARTING_LOADOUT.armor;
 state.player.special = STARTING_LOADOUT.special;
 
 bindPointerLook({ canvas, state, settings });
+bindTouchControls({
+  root: touchControls,
+  keys,
+  actions: {
+    fire: fireTool,
+    use: useAction,
+    special: specialAction,
+    tool: cycleTool,
+    continue: continueAction
+  }
+});
 
 window.addEventListener("resize", () => fitCanvas(canvas));
 window.addEventListener("keydown", (event) => {
   keys.add(event.code);
   if (event.code === "Enter" && state.storyPanel) {
-    queueSound(state.sounds, "ui_continue");
-    advanceStoryPanel();
+    continueAction();
     return;
   }
   if (event.code === "Escape" && !state.storyPanel) {
@@ -77,18 +90,9 @@ window.addEventListener("keydown", (event) => {
     return;
   }
   if (!canRunWorld(state)) return;
-  if (event.code === "Space") {
-    queueSound(state.sounds, "tool_blaster");
-    useEquippedTool(state, threats);
-  }
-  if (event.code === "KeyF") {
-    queueSound(state.sounds, "route_access");
-    interact(state, LEVEL);
-  }
-  if (event.code === "KeyR") {
-    queueSound(state.sounds, "special_burst");
-    activateSpecial(state, threats);
-  }
+  if (event.code === "Space") fireTool();
+  if (event.code === "KeyF") useAction();
+  if (event.code === "KeyR") specialAction();
   if (event.code.startsWith("Digit")) equipToolBySlot(state, Number(event.code.replace("Digit", "")));
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
@@ -98,6 +102,49 @@ startButton.addEventListener("click", () => {
   menu.classList.add("hidden");
   state.storyPanel = state.pendingBriefing;
 });
+
+function continueAction() {
+  if (!state.storyPanel) return;
+  queueSound(state.sounds, "ui_continue");
+  advanceStoryPanel();
+}
+
+function fireTool() {
+  if (!canRunWorld(state)) return;
+  queueSound(state.sounds, "tool_blaster");
+  useEquippedTool(state, threats);
+}
+
+function useAction() {
+  if (!canRunWorld(state)) return;
+  queueSound(state.sounds, "route_access");
+  interact(state, LEVEL);
+}
+
+function specialAction() {
+  if (!canRunWorld(state)) return;
+  queueSound(state.sounds, "special_burst");
+  activateSpecial(state, threats);
+}
+
+function cycleTool() {
+  if (!canRunWorld(state)) return;
+  const slots = Object.values(GEAR_BALANCE)
+    .map((balance) => balance.slot)
+    .filter((slot, index, all) => Number.isInteger(slot) && all.indexOf(slot) === index)
+    .sort((a, b) => a - b);
+  if (!slots.length) return;
+
+  const currentSlot = GEAR_BALANCE[state.tools.equipped]?.slot ?? slots[0];
+  const currentIndex = Math.max(0, slots.indexOf(currentSlot));
+  for (let offset = 1; offset <= slots.length; offset += 1) {
+    const slot = slots[(currentIndex + offset) % slots.length];
+    if (equipToolBySlot(state, slot)) {
+      queueSound(state.sounds, "ui_continue");
+      return;
+    }
+  }
+}
 
 function advanceStoryPanel() {
   if (state.storyPanel?.type === "intro") {
