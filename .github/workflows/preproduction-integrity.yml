@@ -74,8 +74,10 @@ jobs:
           required=(
             prototypes/web-fps-v2/index.html
             prototypes/web-fps-v2/styles.css
+            prototypes/web-fps-v2/hud.css
             prototypes/web-fps-v2/src/app.js
             prototypes/web-fps-v2/src/render.js
+            prototypes/web-fps-v2/src/hud-dom.js
             prototypes/web-fps-v2/src/input-system.js
             prototypes/web-fps-v2/src/touch-controls.js
             prototypes/web-fps-v2/src/movement-system.js
@@ -95,6 +97,10 @@ jobs:
           node --check tests/v2-gameplay-smoke.mjs
           node --experimental-default-type=module tests/v2-gameplay-smoke.mjs
           grep -Fq 'id="touchControls"' prototypes/web-fps-v2/index.html
+          grep -Fq 'id="gameHud"' prototypes/web-fps-v2/index.html
+          grep -Fq './hud.css' prototypes/web-fps-v2/index.html
           grep -Fq 'bindTouchControls' prototypes/web-fps-v2/src/app.js
+          grep -Fq 'bindHud' prototypes/web-fps-v2/src/app.js
+          grep -Fq 'drawDepthClippedSprite' prototypes/web-fps-v2/src/render.js
           grep -Fq 'data-action="fire"' prototypes/web-fps-v2/index.html
           grep -Fq 'data-hold-code="KeyW"' prototypes/web-fps-v2/index.html
