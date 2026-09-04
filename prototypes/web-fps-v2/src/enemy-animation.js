@@ -4,7 +4,7 @@ export function getEnemyAnimationState(threat, now = performance.now()) {
   if (threat.cleared || threat.health <= 0) return "death";
   if (now - (threat.lastHitAt || 0) < 160) return "hit";
   if (now - (threat.lastAttackAt || 0) < 220) return "attack";
-  if ((threat.speed || 0) > 0) return "chase";
+  if (now - (threat.lastMoveAt || 0) < 180) return "chase";
   return "idle";
 }
 
