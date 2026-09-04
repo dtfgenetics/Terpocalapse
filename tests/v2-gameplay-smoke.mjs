@@ -3,6 +3,7 @@ import { findGateTiles, markGateOpen } from "../prototypes/web-fps-v2/src/gate-m
 import { isSolid, safeMove } from "../prototypes/web-fps-v2/src/map.js";
 import { sampleDepth } from "../prototypes/web-fps-v2/src/depth-sampler.js";
 import { findAimedThreat } from "../prototypes/web-fps-v2/src/tool-system.js";
+import { createProgress, advanceProgress, setProgressAtLeast } from "../prototypes/web-fps-v2/src/progress-system.js";
 
 const TILE = 64;
 
@@ -99,6 +100,18 @@ function center(tx, ty) {
   const balance = { reach: 520, ammo: "light", spread: 1 };
 
   assert.equal(findAimedThreat(state, level, [offAxisThreat, visibleThreat], balance), visibleThreat, "weapons should prefer a visible threat inside the aim cone");
+}
+
+{
+  const progress = createProgress(["Supply", "Access", "Exit"]);
+  advanceProgress(progress);
+  assert.equal(progress.current, 1, "the first real supply milestone should advance one objective");
+  setProgressAtLeast(progress, 2);
+  assert.equal(progress.current, 2, "route access should advance directly to the exit objective");
+  setProgressAtLeast(progress, 1);
+  assert.equal(progress.current, 2, "late lower milestones must never move mission progress backward");
+  setProgressAtLeast(progress, 99);
+  assert.equal(progress.current, 3, "mission completion must clamp to the objective count");
 }
 
 console.log("V2 gameplay smoke tests passed.");
