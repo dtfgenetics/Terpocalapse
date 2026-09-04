@@ -2,19 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Terpocalypse V2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#030704" />
+  <meta name="description" content="Terpocalypse: Grow Room From Hell — an original cannabis-horror retro browser FPS from DTF Genetics." />
+  <link rel="canonical" href="https://dtfseeds.com/games/terpocalypse/" />
+  <title>Terpocalypse: Grow Room From Hell | DTF Game Hub</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <main id="app" class="app">
-    <canvas id="game" class="game" width="960" height="540"></canvas>
-    <section id="menu" class="menu">
-      <p class="eyebrow">THC / Teaching Healthy Cultivation</p>
-      <h1>Terpocalypse</h1>
-      <p class="subtitle">Grow Room From Hell</p>
-      <p class="copy">V2 prototype shell. Built to replace placeholders safely after the first gameplay loop is confirmed.</p>
-      <button id="startButton" type="button">Start V2 Shell</button>
+    <canvas id="game" class="game" width="960" height="540" aria-label="Terpocalypse first-person game view"></canvas>
+
+    <a class="hub-back" href="/games/">← DTF Game Hub</a>
+
+    <section id="menu" class="menu" aria-labelledby="gameTitle">
+      <div class="menu-card">
+        <p class="eyebrow">DTF Genetics · THC Game Lab</p>
+        <p class="warning-strip">⚠ TERP CONTAINMENT FAILURE · GROWER ACCESS ONLY ⚠</p>
+        <h1 id="gameTitle">TERPOCALYPSE</h1>
+        <p class="subtitle">Grow Room From Hell</p>
+        <div class="mission-chip">EPISODE 01 · THE VEG LAB</div>
+        <p class="copy">The grow bunker has gone completely sideways. Mutant mites are mobbing the veg room, mildew ghouls are wandering the halls, and somebody fed the nutrient tank like it owed them money. Grab the pH Blaster, recover route access, and clean up this botanical disaster.</p>
+
+        <div class="loadout" aria-label="Starting mission loadout">
+          <span>✂ Trim Shears</span>
+          <span>⚗ pH Blaster</span>
+          <span>☣ Neem Cannon</span>
+          <span>✦ Trichome Burst</span>
+        </div>
+
+        <button id="startButton" type="button">Enter The Veg Lab</button>
+
+        <div class="controls-grid" aria-label="Controls">
+          <span><b>MOVE</b> WASD</span>
+          <span><b>LOOK</b> Mouse</span>
+          <span><b>FIRE</b> Space</span>
+          <span><b>USE</b> F</span>
+          <span><b>TOOLS</b> 1–3</span>
+          <span><b>BURST</b> R</span>
+        </div>
+
+        <p class="legal-note">Original retro-shooter parody · original cannabis world, enemies, weapons, code and art direction · no commercial shooter assets</p>
+      </div>
     </section>
   </main>
   <script type="module" src="./src/app.js"></script>
