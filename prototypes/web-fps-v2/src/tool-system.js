@@ -58,6 +58,7 @@ export function useEquippedTool(state, level, threats, now = performance.now()) 
   const hitCount = Math.max(1, balance.spread || 1);
   const damage = balance.power * hitCount;
   target.health = Math.max(0, target.health - damage);
+  target.lastHitAt = now;
   state.stats.hits = (state.stats.hits || 0) + 1;
   state.hitConfirmUntil = now + 150;
   state.message = `${formatToolName(toolId)} hit ${target.name}.`;
