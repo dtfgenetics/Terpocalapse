@@ -39,6 +39,7 @@ export function createThreats(level, spawnPlan) {
       lastPressureAt: 0,
       lastAttackAt: 0,
       lastHitAt: 0,
+      lastMoveAt: 0,
       animationFrames: 4,
       animationFrameMs: 140,
       animationPhase: index * 37
@@ -59,7 +60,10 @@ export function updateThreats(state, level, threats, dt, now = performance.now()
 
     if (dist > threat.range && dist < level.tileSize * 7 && canSeePlayer) {
       const step = Math.min(threat.speed * dt, dist);
+      const beforeX = threat.x;
+      const beforeY = threat.y;
       safeMove(level, threat, (dx / dist) * step, (dy / dist) * step, state);
+      if (Math.hypot(threat.x - beforeX, threat.y - beforeY) > 0.01) threat.lastMoveAt = now;
     }
 
     if (dist <= threat.range && canSeePlayer && now - threat.lastPressureAt > 800) {
