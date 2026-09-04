@@ -15,6 +15,27 @@
 
     <a class="hub-back" href="/games/">← DTF Game Hub</a>
 
+    <section id="gameHud" class="game-hud" aria-label="Mission HUD" hidden>
+      <div class="hud-objective" aria-live="polite">
+        <span class="hud-kicker">Current objective</span>
+        <strong id="hudObjective">Find the first supply pickup</strong>
+      </div>
+
+      <div class="hud-vitals" aria-label="Player status">
+        <div class="hud-stat"><span>HP</span><strong id="hudHp">100</strong></div>
+        <div class="hud-stat"><span>Armor</span><strong id="hudArmor">0</strong></div>
+        <div class="hud-stat hud-special"><span>Burst</span><strong id="hudSpecial">0</strong></div>
+      </div>
+
+      <div class="hud-combat" aria-label="Combat status">
+        <div class="hud-tool"><span>Equipped</span><strong id="hudTool">Trim Shears</strong></div>
+        <div class="hud-ammo"><span>Ammo</span><strong id="hudAmmo">∞</strong></div>
+        <div class="hud-score"><span>Score</span><strong id="hudScore">0</strong></div>
+      </div>
+
+      <p id="hudMessage" class="hud-message" aria-live="polite"></p>
+    </section>
+
     <section id="menu" class="menu" aria-labelledby="gameTitle">
       <div class="menu-card">
         <p class="eyebrow">DTF Genetics · THC Game Lab</p>
