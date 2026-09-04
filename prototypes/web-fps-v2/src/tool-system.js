@@ -41,6 +41,7 @@ export function useEquippedTool(state, level, threats, now = performance.now()) 
   }
 
   state.tools.lastUseAt = now;
+  state.hitConfirmUntil = 0;
   state.stats.shots = (state.stats.shots || 0) + 1;
   state.effects = state.effects || [];
 
@@ -58,6 +59,7 @@ export function useEquippedTool(state, level, threats, now = performance.now()) 
   const damage = balance.power * hitCount;
   target.health = Math.max(0, target.health - damage);
   state.stats.hits = (state.stats.hits || 0) + 1;
+  state.hitConfirmUntil = now + 150;
   state.message = `${formatToolName(toolId)} hit ${target.name}.`;
 
   if (target.health <= 0 && !target.cleared) {
