@@ -1,5 +1,6 @@
 import { GEAR_BALANCE } from "./gear-balance.js";
 import { addLine, addPulse } from "./effect-system.js";
+import { sampleDepth } from "./depth-sampler.js";
 
 export function createToolState(loadout) {
   const tools = [...(loadout?.tools || ["trim_shears"])]
@@ -29,7 +30,7 @@ export function equipToolBySlot(state, slot) {
   return true;
 }
 
-export function useEquippedTool(state, threats, now = performance.now()) {
+export function useEquippedTool(state, level, threats, now = performance.now()) {
   const toolId = state.tools.equipped;
   const balance = GEAR_BALANCE[toolId] || GEAR_BALANCE.trim_shears;
   if (now - state.tools.lastUseAt < balance.cooldownMs) return null;
@@ -43,10 +44,10 @@ export function useEquippedTool(state, threats, now = performance.now()) {
   state.stats.shots = (state.stats.shots || 0) + 1;
   state.effects = state.effects || [];
 
-  const target = findNearestThreat(state, threats, balance.reach);
+  const target = findAimedThreat(state, level, threats, balance);
   if (!target) {
     addPulse(state.effects, state.player.x, state.player.y, "#7cff5b", 120);
-    state.message = `${formatToolName(toolId)} used.`;
+    state.message = `${formatToolName(toolId)} missed.`;
     return null;
   }
 
@@ -56,6 +57,7 @@ export function useEquippedTool(state, threats, now = performance.now()) {
   const hitCount = Math.max(1, balance.spread || 1);
   const damage = balance.power * hitCount;
   target.health = Math.max(0, target.health - damage);
+  state.stats.hits = (state.stats.hits || 0) + 1;
   state.message = `${formatToolName(toolId)} hit ${target.name}.`;
 
   if (target.health <= 0 && !target.cleared) {
@@ -68,18 +70,50 @@ export function useEquippedTool(state, threats, now = performance.now()) {
   return target;
 }
 
-function findNearestThreat(state, threats, reach) {
+export function findAimedThreat(state, level, threats, balance) {
+  const reach = balance.reach || 90;
+  const aimCone = getAimCone(balance);
   let best = null;
-  let bestDistance = Infinity;
+  let bestScore = Infinity;
+
   for (const threat of threats) {
     if (threat.cleared) continue;
-    const distance = Math.hypot(threat.x - state.player.x, threat.y - state.player.y);
-    if (distance <= reach && distance < bestDistance) {
+    const dx = threat.x - state.player.x;
+    const dy = threat.y - state.player.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance > reach || distance <= 0.001) continue;
+
+    const targetAngle = Math.atan2(dy, dx);
+    const angleError = Math.abs(normalizeAngle(targetAngle - state.player.angle));
+    if (angleError > aimCone) continue;
+    if (!hasLineOfSight(state, level, targetAngle, distance, threat.radius || 14)) continue;
+
+    const score = angleError * 1000 + distance;
+    if (score < bestScore) {
       best = threat;
-      bestDistance = distance;
+      bestScore = score;
     }
   }
+
   return best;
+}
+
+function hasLineOfSight(state, level, angle, distance, targetRadius) {
+  const hit = sampleDepth(level, state.player.x, state.player.y, angle, distance, state);
+  return hit.distance >= distance - Math.max(6, targetRadius);
+}
+
+function getAimCone(balance) {
+  if (!balance.ammo) return 0.62;
+  if ((balance.spread || 1) > 1) return 0.30;
+  return 0.13;
+}
+
+function normalizeAngle(angle) {
+  let result = angle;
+  while (result > Math.PI) result -= Math.PI * 2;
+  while (result < -Math.PI) result += Math.PI * 2;
+  return result;
 }
 
 function spendAmmo(state, ammoType) {
