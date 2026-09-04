@@ -4,7 +4,9 @@ export function createAssetStore() {
   return new Map();
 }
 
-export async function preloadAssets(store, entries = listAssetEntries()) {
+export const ASSET_STORE = createAssetStore();
+
+export async function preloadAssets(store = ASSET_STORE, entries = listAssetEntries()) {
   if (typeof Image === "undefined") return store;
   await Promise.all(entries.map((entry) => loadImage(store, entry)));
   return store;
@@ -13,6 +15,10 @@ export async function preloadAssets(store, entries = listAssetEntries()) {
 export function getLoadedImage(store, key) {
   const record = store?.get(key);
   return record?.status === "ready" ? record.image : null;
+}
+
+export function getAssetStatus(store, key) {
+  return store?.get(key)?.status || "missing";
 }
 
 function loadImage(store, entry) {
@@ -30,3 +36,5 @@ function loadImage(store, entry) {
     image.src = entry.src;
   });
 }
+
+if (typeof window !== "undefined") preloadAssets();
