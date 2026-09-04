@@ -84,13 +84,16 @@ jobs:
             prototypes/web-fps-v2/src/pickup-system.js
             prototypes/web-fps-v2/src/progress-system.js
             prototypes/web-fps-v2/src/special-system.js
+            tests/v2-gameplay-smoke.mjs
           )
           for file in "${required[@]}"; do
-            test -s "$file" || { echo "Missing V2 runtime file: $file" >&2; exit 1; }
+            test -s "$file" || { echo "Missing V2 runtime/test file: $file" >&2; exit 1; }
           done
           while IFS= read -r file; do
             node --input-type=module --check < "$file"
           done < <(find prototypes/web-fps-v2/src -maxdepth 1 -type f -name '*.js' -print | sort)
+          node --check tests/v2-gameplay-smoke.mjs
+          node --experimental-default-type=module tests/v2-gameplay-smoke.mjs
           grep -Fq 'id="touchControls"' prototypes/web-fps-v2/index.html
           grep -Fq 'bindTouchControls' prototypes/web-fps-v2/src/app.js
           grep -Fq 'data-action="fire"' prototypes/web-fps-v2/index.html
