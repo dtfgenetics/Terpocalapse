@@ -74,6 +74,5 @@ function getCellByTile(level, tx, ty) {
 function isBlockingCell(cell, state, tx, ty) {
   if (cell === "#") return true;
   if (cell !== "D") return false;
-  if (state?.keyOpen) return false;
   return !gateIsOpen(state?.gates || [], tx, ty);
 }
