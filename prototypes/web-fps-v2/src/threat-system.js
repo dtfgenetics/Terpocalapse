@@ -36,7 +36,12 @@ export function createThreats(level, spawnPlan) {
       points: balance.points,
       color: THREAT_COLORS[id] || "#ff8c2f",
       cleared: false,
-      lastPressureAt: 0
+      lastPressureAt: 0,
+      lastAttackAt: 0,
+      lastHitAt: 0,
+      animationFrames: 4,
+      animationFrameMs: 140,
+      animationPhase: index * 37
     };
   });
 }
@@ -59,6 +64,7 @@ export function updateThreats(state, level, threats, dt, now = performance.now()
 
     if (dist <= threat.range && canSeePlayer && now - threat.lastPressureAt > 800) {
       threat.lastPressureAt = now;
+      threat.lastAttackAt = now;
       applyPlayerPressure(state, threat.pressure, threat.name, now);
     }
   }
