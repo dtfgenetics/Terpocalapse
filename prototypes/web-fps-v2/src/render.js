@@ -1,4 +1,3 @@
-import { buildHudLines } from "./hud-lines.js";
 import { drawWallView } from "./wall-view.js";
 import { projectWorldPoint } from "./projection-math.js";
 import { allowFlashes } from "./display-preferences.js";
@@ -12,23 +11,23 @@ export function fitCanvas(canvas) {
 }
 
 export function paint(ctx, canvas, state, level) {
+  const now = performance.now();
   const view = drawWallView(ctx, canvas, state, level);
   drawProjectedMarkers(ctx, canvas, state, view);
-  drawCrosshair(ctx, canvas, state);
-  drawFirstPersonTool(ctx, canvas, state);
+  drawCrosshair(ctx, canvas, state, now);
+  drawFirstPersonTool(ctx, canvas, state, now);
 
-  if (allowFlashes(state.settings) && state.damageFlashUntil && performance.now() < state.damageFlashUntil) {
+  if (allowFlashes(state.settings) && state.damageFlashUntil && now < state.damageFlashUntil) {
     ctx.fillStyle = "rgba(255, 95, 126, 0.16)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  if (allowFlashes(state.settings) && state.specialFlashUntil && performance.now() < state.specialFlashUntil) {
+  if (allowFlashes(state.settings) && state.specialFlashUntil && now < state.specialFlashUntil) {
     ctx.fillStyle = "rgba(124, 255, 91, 0.12)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  if (state.settings?.debugMiniMap !== false) drawDebugMap(ctx, state, level);
-  drawHudLines(ctx, canvas, state, level);
+  if (state.settings?.debugMiniMap === true) drawDebugMap(ctx, state, level);
   if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
 }
 
@@ -44,31 +43,65 @@ function drawProjectedMarkers(ctx, canvas, state, view) {
 
   for (const item of items) {
     const projected = projectWorldPoint(state, canvas, item.x, item.y, view.fov);
-    if (!projected || isOccluded(projected, canvas, view)) continue;
+    if (!projected) continue;
 
     const size = Math.max(12, Math.min(item.renderKind === "threat" ? 116 : 74, projected.size));
-    if (item.renderKind === "threat") drawThreatSprite(ctx, item, projected.screenX, projected.screenY, size);
-    else drawPickupSprite(ctx, item, projected.screenX, projected.screenY, size);
+    drawDepthClippedSprite(ctx, canvas, view, projected, size, () => {
+      if (item.renderKind === "threat") drawThreatSprite(ctx, item, projected.screenX, projected.screenY, size);
+      else drawPickupSprite(ctx, item, projected.screenX, projected.screenY, size);
+    });
   }
 }
 
-function isOccluded(projected, canvas, view) {
-  if (!view?.depthBuffer?.length) return false;
-  const normalizedX = Math.max(0, Math.min(0.999999, projected.screenX / canvas.width));
-  const column = Math.min(view.columns - 1, Math.floor(normalizedX * view.columns));
-  const wallDepth = view.depthBuffer[column];
-  return Number.isFinite(wallDepth) && projected.cameraDepth > wallDepth + 10;
+function drawDepthClippedSprite(ctx, canvas, view, projected, size, drawSprite) {
+  if (!view?.depthBuffer?.length || !Number.isFinite(projected.cameraDepth)) {
+    drawSprite();
+    return;
+  }
+
+  const halfWidth = size * 0.56;
+  const left = Math.max(0, projected.screenX - halfWidth);
+  const right = Math.min(canvas.width, projected.screenX + halfWidth);
+  if (right <= left) return;
+
+  const firstColumn = Math.max(0, Math.floor((left / canvas.width) * view.columns));
+  const lastColumn = Math.min(view.columns - 1, Math.floor((right / canvas.width) * view.columns));
+  const columnWidth = canvas.width / view.columns;
+  let runStart = null;
+
+  const flushRun = (runEnd) => {
+    if (runStart === null) return;
+    const clipLeft = runStart * columnWidth;
+    const clipRight = Math.min(canvas.width, (runEnd + 1) * columnWidth);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(clipLeft, Math.max(0, projected.screenY - size * 0.7), clipRight - clipLeft, size * 1.45);
+    ctx.clip();
+    drawSprite();
+    ctx.restore();
+    runStart = null;
+  };
+
+  for (let column = firstColumn; column <= lastColumn; column += 1) {
+    const wallDepth = view.depthBuffer[column];
+    const visible = !Number.isFinite(wallDepth) || projected.cameraDepth <= wallDepth + 10;
+    if (visible && runStart === null) runStart = column;
+    if (!visible && runStart !== null) flushRun(column - 1);
+  }
+  flushRun(lastColumn);
 }
 
-function drawCrosshair(ctx, canvas, state) {
+function drawCrosshair(ctx, canvas, state, now) {
   if (state.storyPanel || state.mode === "menu") return;
   const x = Math.round(canvas.width / 2);
   const y = Math.round(canvas.height / 2);
-  const spread = 7;
-  const arm = 8;
+  const hitConfirmed = now < (state.hitConfirmUntil || 0);
+  const spread = hitConfirmed ? 5 : 7;
+  const arm = hitConfirmed ? 10 : 8;
+
   ctx.save();
-  ctx.strokeStyle = "rgba(240, 255, 233, 0.88)";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = hitConfirmed ? "rgba(255, 200, 87, 0.98)" : "rgba(240, 255, 233, 0.88)";
+  ctx.lineWidth = hitConfirmed ? 3 : 2;
   ctx.beginPath();
   ctx.moveTo(x - spread - arm, y);
   ctx.lineTo(x - spread, y);
@@ -79,6 +112,21 @@ function drawCrosshair(ctx, canvas, state) {
   ctx.moveTo(x, y + spread);
   ctx.lineTo(x, y + spread + arm);
   ctx.stroke();
+
+  if (hitConfirmed) {
+    const d = 10;
+    const m = 4;
+    ctx.beginPath();
+    ctx.moveTo(x - d, y - d);
+    ctx.lineTo(x - m, y - m);
+    ctx.moveTo(x + d, y - d);
+    ctx.lineTo(x + m, y - m);
+    ctx.moveTo(x - d, y + d);
+    ctx.lineTo(x - m, y + m);
+    ctx.moveTo(x + d, y + d);
+    ctx.lineTo(x + m, y + m);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -144,19 +192,6 @@ function drawMapEffects(ctx, state, level, size) {
       ctx.stroke();
     }
   }
-}
-
-function drawHudLines(ctx, canvas, state, level) {
-  const lines = buildHudLines(state);
-  ctx.fillStyle = "#7cff5b";
-  ctx.font = "20px monospace";
-  let y = canvas.height - 286;
-  for (const line of lines) {
-    ctx.fillText(line, 24, y);
-    y += 28;
-  }
-  ctx.fillStyle = state.mode === "complete" ? "#ffc857" : state.mode === "failed" ? "#ff5f7e" : "#ffffff";
-  ctx.fillText(state.message || level.goal, 24, canvas.height - 34);
 }
 
 function drawStoryPanel(ctx, canvas, panel) {
