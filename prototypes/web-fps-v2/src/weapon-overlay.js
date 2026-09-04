@@ -1,13 +1,20 @@
-export function drawFirstPersonTool(ctx, canvas, state) {
+export function drawFirstPersonTool(ctx, canvas, state, now = performance.now()) {
   if (state.storyPanel || state.mode === "menu") return;
   const tool = state.tools?.equipped || "trim_shears";
-  const recentUse = performance.now() - (state.tools?.lastUseAt || 0) < 120;
+  const sinceUse = now - (state.tools?.lastUseAt || 0);
+  const recoilWindow = 150;
+  const recoilT = Math.max(0, Math.min(1, 1 - sinceUse / recoilWindow));
+  const reducedMotion = state.settings?.reducedMotion === true;
+  const recoil = reducedMotion ? 0 : Math.sin(recoilT * Math.PI) * 24;
+  const bob = reducedMotion || !state.isSprinting ? 0 : Math.sin(now / 90) * 4;
+  const recentUse = sinceUse < 90;
   const scale = Math.max(0.72, Math.min(1.25, canvas.width / 960));
-  const x = canvas.width * 0.66;
-  const y = canvas.height - (recentUse ? 32 : 18) * scale;
+  const x = canvas.width * 0.66 + bob * scale;
+  const y = canvas.height - (18 + recoil + Math.abs(bob) * 0.6) * scale;
 
   ctx.save();
   ctx.translate(x, y);
+  ctx.rotate(reducedMotion ? 0 : -recoil * 0.0015);
   ctx.scale(scale, scale);
   ctx.lineWidth = 5;
   ctx.strokeStyle = "#101610";
