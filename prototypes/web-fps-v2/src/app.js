@@ -112,7 +112,7 @@ function continueAction() {
 function fireTool() {
   if (!canRunWorld(state)) return;
   queueSound(state.sounds, "tool_blaster");
-  useEquippedTool(state, threats);
+  useEquippedTool(state, LEVEL, threats);
 }
 
 function useAction() {
