@@ -2,7 +2,7 @@ import { drawWallView } from "./wall-view.js";
 import { projectWorldPoint } from "./projection-math.js";
 import { allowFlashes } from "./display-preferences.js";
 import { gateIsOpen } from "./gate-map.js";
-import { drawThreatSprite, drawPickupSprite } from "./procedural-sprites.js";
+import { drawThreatSprite, drawPickupSprite } from "./runtime-sprites.js";
 import { drawFirstPersonTool } from "./weapon-overlay.js";
 
 export function fitCanvas(canvas) {
@@ -13,7 +13,7 @@ export function fitCanvas(canvas) {
 export function paint(ctx, canvas, state, level) {
   const now = performance.now();
   const view = drawWallView(ctx, canvas, state, level);
-  drawProjectedMarkers(ctx, canvas, state, view);
+  drawProjectedMarkers(ctx, canvas, state, view, now);
   drawCrosshair(ctx, canvas, state, now);
   drawFirstPersonTool(ctx, canvas, state, now);
 
@@ -31,7 +31,7 @@ export function paint(ctx, canvas, state, level) {
   if (state.storyPanel) drawStoryPanel(ctx, canvas, state.storyPanel);
 }
 
-function drawProjectedMarkers(ctx, canvas, state, view) {
+function drawProjectedMarkers(ctx, canvas, state, view, now) {
   const items = [];
   for (const pickup of state.pickups || []) if (!pickup.collected) items.push({ ...pickup, renderKind: "pickup" });
   for (const threat of state.threats || []) if (!threat.cleared) items.push({ ...threat, renderKind: "threat" });
@@ -47,7 +47,7 @@ function drawProjectedMarkers(ctx, canvas, state, view) {
 
     const size = Math.max(12, Math.min(item.renderKind === "threat" ? 116 : 74, projected.size));
     drawDepthClippedSprite(ctx, canvas, view, projected, size, () => {
-      if (item.renderKind === "threat") drawThreatSprite(ctx, item, projected.screenX, projected.screenY, size);
+      if (item.renderKind === "threat") drawThreatSprite(ctx, item, projected.screenX, projected.screenY, size, now);
       else drawPickupSprite(ctx, item, projected.screenX, projected.screenY, size);
     });
   }
