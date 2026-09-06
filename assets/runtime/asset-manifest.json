@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "game": "terpocalypse",
+  "level": "veg-lab",
+  "assets": {
+    "enemy.vegLabMite": {
+      "kind": "animatedModel",
+      "source": "tools/blender/generate_veg_lab_enemy.py",
+      "authoringOutput": "build/blender/veg-lab-mite.blend",
+      "runtimeOutput": "build/blender/veg-lab-mite.glb",
+      "status": "pipeline-placeholder",
+      "animations": {
+        "idle": "Idle",
+        "chase": "Scuttle",
+        "pain": "Hit",
+        "dead": "Death"
+      },
+      "pivot": "ground-center",
+      "units": "meters"
+    }
+  }
+}
