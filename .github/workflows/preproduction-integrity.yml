@@ -55,9 +55,12 @@ jobs:
           test -s prototypes/web-fps/game-data.js
           test -s prototypes/web-fps/styles.css
           test -s prototypes/web-fps/visibility-pause-v1.js
+          test -s prototypes/web-fps/validate-level.mjs
           node --check prototypes/web-fps/main.js
           node --check prototypes/web-fps/game-data.js
           node --check prototypes/web-fps/visibility-pause-v1.js
+          node --check prototypes/web-fps/validate-level.mjs
+          node prototypes/web-fps/validate-level.mjs
           grep -Fq 'Playable browser vertical slice plus asset-first production.' README.md
           grep -Fq 'visibility-pause-v1.js' prototypes/web-fps/index.html
           grep -Fq "releaseHeldKeyboardControls" prototypes/web-fps/visibility-pause-v1.js
