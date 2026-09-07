@@ -1,0 +1,213 @@
+.game-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  color: #f0ffe9;
+}
+
+.game-hud[hidden] {
+  display: none;
+}
+
+.hud-objective,
+.hud-vitals,
+.hud-combat,
+.hud-message {
+  position: absolute;
+  border: 1px solid rgba(124, 255, 91, 0.35);
+  background: linear-gradient(180deg, rgba(5, 15, 8, 0.84), rgba(2, 7, 4, 0.78));
+  box-shadow: inset 0 0 18px rgba(124, 255, 91, 0.04), 0 6px 24px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.hud-objective {
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  width: min(430px, calc(100vw - 220px));
+  transform: translateX(-50%);
+  padding: 8px 14px 9px;
+  text-align: center;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%, 0 8px);
+}
+
+.hud-kicker,
+.hud-stat span,
+.hud-tool span,
+.hud-ammo span,
+.hud-score span {
+  display: block;
+  color: #ffc857;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hud-objective strong {
+  display: block;
+  margin-top: 3px;
+  color: #f5fff1;
+  font-size: clamp(0.72rem, 1.3vw, 0.9rem);
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.hud-vitals {
+  left: max(14px, env(safe-area-inset-left));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(58px, 76px));
+}
+
+.hud-combat {
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(118px, 168px) minmax(62px, 78px) minmax(62px, 82px);
+}
+
+.hud-stat,
+.hud-tool,
+.hud-ammo,
+.hud-score {
+  min-height: 54px;
+  padding: 8px 10px;
+  border-right: 1px solid rgba(124, 255, 91, 0.14);
+}
+
+.hud-stat:last-child,
+.hud-score {
+  border-right: 0;
+}
+
+.hud-stat strong,
+.hud-tool strong,
+.hud-ammo strong,
+.hud-score strong {
+  display: block;
+  margin-top: 4px;
+  color: #7cff5b;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.hud-special strong {
+  color: #dca2ff;
+}
+
+.hud-tool strong {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.hud-message {
+  left: 50%;
+  bottom: max(84px, calc(env(safe-area-inset-bottom) + 84px));
+  width: fit-content;
+  max-width: min(580px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 7px 12px;
+  color: #dcebdc;
+  border-color: rgba(255, 200, 87, 0.3);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.game-hud.is-danger .hud-vitals {
+  border-color: rgba(255, 95, 126, 0.62);
+}
+
+.game-hud.is-danger #hudHp {
+  color: #ff5f7e;
+}
+
+.game-hud.is-complete .hud-objective {
+  border-color: rgba(255, 200, 87, 0.8);
+}
+
+.game-hud.is-complete .hud-objective strong {
+  color: #ffc857;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .hud-vitals {
+    bottom: max(176px, calc(env(safe-area-inset-bottom) + 176px));
+  }
+
+  .hud-combat {
+    bottom: max(176px, calc(env(safe-area-inset-bottom) + 176px));
+  }
+
+  .hud-message {
+    bottom: max(238px, calc(env(safe-area-inset-bottom) + 238px));
+  }
+}
+
+@media (max-width: 720px) {
+  .hud-objective {
+    top: max(10px, env(safe-area-inset-top));
+    width: min(340px, calc(100vw - 116px));
+    padding-inline: 10px;
+  }
+
+  .hud-vitals,
+  .hud-combat {
+    grid-template-columns: repeat(3, minmax(48px, 1fr));
+  }
+
+  .hud-vitals {
+    right: auto;
+    width: min(46vw, 220px);
+  }
+
+  .hud-combat {
+    left: auto;
+    width: min(48vw, 240px);
+  }
+
+  .hud-stat,
+  .hud-tool,
+  .hud-ammo,
+  .hud-score {
+    min-height: 48px;
+    padding: 6px 7px;
+  }
+
+  .hud-tool strong {
+    font-size: 0.66rem;
+  }
+}
+
+@media (max-height: 650px) and (orientation: landscape) {
+  .hud-objective {
+    top: max(8px, env(safe-area-inset-top));
+    width: min(360px, calc(100vw - 300px));
+    padding-block: 5px 6px;
+  }
+
+  .hud-kicker {
+    display: none;
+  }
+
+  .hud-vitals {
+    left: max(150px, calc(env(safe-area-inset-left) + 150px));
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .hud-combat {
+    right: max(220px, calc(env(safe-area-inset-right) + 220px));
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .hud-message {
+    bottom: max(68px, calc(env(safe-area-inset-bottom) + 68px));
+  }
+}

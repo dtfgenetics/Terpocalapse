@@ -1,26 +1,78 @@
-import { getMapCell, getTilePoint } from "./map.js";
 import { gateIsOpen } from "./gate-map.js";
 
 export function sampleDepth(level, x, y, angle, limit = 900, state = null) {
-  const step = 6;
-  const dx = Math.cos(angle);
-  const dy = Math.sin(angle);
+  const tileSize = level.tileSize;
+  const dirX = Math.cos(angle);
+  const dirY = Math.sin(angle);
+  const posX = x / tileSize;
+  const posY = y / tileSize;
 
-  for (let distance = 0; distance <= limit; distance += step) {
-    const px = x + dx * distance;
-    const py = y + dy * distance;
-    const cell = getMapCell(level, px, py);
-    const tile = getTilePoint(level, px, py);
-    if (cell === "#") return { distance, cell, x: px, y: py };
-    if (cell === "D" && !state?.keyOpen && !gateIsOpen(state?.gates || [], tile.tx, tile.ty)) {
-      return { distance, cell, x: px, y: py };
+  let mapX = Math.floor(posX);
+  let mapY = Math.floor(posY);
+
+  const deltaDistX = dirX === 0 ? Infinity : Math.abs(1 / dirX);
+  const deltaDistY = dirY === 0 ? Infinity : Math.abs(1 / dirY);
+  const stepX = dirX < 0 ? -1 : 1;
+  const stepY = dirY < 0 ? -1 : 1;
+
+  let sideDistX = dirX < 0
+    ? (posX - mapX) * deltaDistX
+    : (mapX + 1 - posX) * deltaDistX;
+  let sideDistY = dirY < 0
+    ? (posY - mapY) * deltaDistY
+    : (mapY + 1 - posY) * deltaDistY;
+
+  const maxTileDistance = limit / tileSize;
+  let side = "x";
+  let distanceTiles = 0;
+
+  while (distanceTiles <= maxTileDistance) {
+    if (sideDistX < sideDistY) {
+      distanceTiles = sideDistX;
+      sideDistX += deltaDistX;
+      mapX += stepX;
+      side = "x";
+    } else {
+      distanceTiles = sideDistY;
+      sideDistY += deltaDistY;
+      mapY += stepY;
+      side = "y";
     }
+
+    const cell = getCellByTile(level, mapX, mapY);
+    if (!isBlockingCell(cell, state, mapX, mapY)) continue;
+
+    const distance = Math.min(limit, distanceTiles * tileSize);
+    return {
+      distance,
+      cell,
+      x: x + dirX * distance,
+      y: y + dirY * distance,
+      tx: mapX,
+      ty: mapY,
+      side
+    };
   }
 
   return {
     distance: limit,
     cell: ".",
-    x: x + dx * limit,
-    y: y + dy * limit
+    x: x + dirX * limit,
+    y: y + dirY * limit,
+    tx: Math.floor((x + dirX * limit) / tileSize),
+    ty: Math.floor((y + dirY * limit) / tileSize),
+    side: null
   };
+}
+
+function getCellByTile(level, tx, ty) {
+  if (ty < 0 || ty >= level.map.length) return "#";
+  if (tx < 0 || tx >= level.map[0].length) return "#";
+  return level.map[ty][tx];
+}
+
+function isBlockingCell(cell, state, tx, ty) {
+  if (cell === "#") return true;
+  if (cell !== "D") return false;
+  return !gateIsOpen(state?.gates || [], tx, ty);
 }

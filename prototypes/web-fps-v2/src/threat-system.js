@@ -1,5 +1,7 @@
 import { THREAT_BALANCE } from "./threat-balance.js";
 import { applyPlayerPressure } from "./damage-system.js";
+import { safeMove } from "./map.js";
+import { sampleDepth } from "./depth-sampler.js";
 
 export const THREAT_COLORS = {
   spider_mite_swarm: "#d94833",
@@ -25,6 +27,7 @@ export function createThreats(level, spawnPlan) {
       name: titleize(id),
       x: (tile.x + 0.5) * level.tileSize,
       y: (tile.y + 0.5) * level.tileSize,
+      radius: Math.max(10, Math.min(18, level.tileSize * 0.2)),
       health: balance.health,
       maxHealth: balance.health,
       speed: balance.speed,
@@ -33,7 +36,13 @@ export function createThreats(level, spawnPlan) {
       points: balance.points,
       color: THREAT_COLORS[id] || "#ff8c2f",
       cleared: false,
-      lastPressureAt: 0
+      lastPressureAt: 0,
+      lastAttackAt: 0,
+      lastHitAt: 0,
+      lastMoveAt: 0,
+      animationFrames: 4,
+      animationFrameMs: 140,
+      animationPhase: index * 37
     };
   });
 }
@@ -45,15 +54,21 @@ export function updateThreats(state, level, threats, dt, now = performance.now()
     const dx = state.player.x - threat.x;
     const dy = state.player.y - threat.y;
     const dist = Math.hypot(dx, dy);
+    if (dist <= 0.001) continue;
 
-    if (dist > threat.range && dist < level.tileSize * 7) {
+    const canSeePlayer = hasLineOfSight(state, level, threat.x, threat.y, state.player.x, state.player.y);
+
+    if (dist > threat.range && dist < level.tileSize * 7 && canSeePlayer) {
       const step = Math.min(threat.speed * dt, dist);
-      threat.x += (dx / dist) * step;
-      threat.y += (dy / dist) * step;
+      const beforeX = threat.x;
+      const beforeY = threat.y;
+      safeMove(level, threat, (dx / dist) * step, (dy / dist) * step, state);
+      if (Math.hypot(threat.x - beforeX, threat.y - beforeY) > 0.01) threat.lastMoveAt = now;
     }
 
-    if (dist <= threat.range && now - threat.lastPressureAt > 800) {
+    if (dist <= threat.range && canSeePlayer && now - threat.lastPressureAt > 800) {
       threat.lastPressureAt = now;
+      threat.lastAttackAt = now;
       applyPlayerPressure(state, threat.pressure, threat.name, now);
     }
   }
@@ -78,6 +93,15 @@ export function clearNearestThreat(state, threats, radius = 55) {
   state.player.score += best.points;
   state.message = `${best.name} cleared.`;
   return best;
+}
+
+function hasLineOfSight(state, level, fromX, fromY, toX, toY) {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const distance = Math.hypot(dx, dy);
+  if (distance <= 0.001) return true;
+  const hit = sampleDepth(level, fromX, fromY, Math.atan2(dy, dx), distance, state);
+  return hit.distance >= distance - Math.max(6, state.player.radius || 14);
 }
 
 function findOpenTilesFromEnd(level) {

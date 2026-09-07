@@ -23,6 +23,6 @@ export function updatePlayerMovement({ state, level, keys, dt, moveFn }) {
   const strafeX = Math.cos(state.player.angle + Math.PI / 2) * strafe * speed * MOVEMENT_DEFAULTS.strafeMultiplier;
   const strafeY = Math.sin(state.player.angle + Math.PI / 2) * strafe * speed * MOVEMENT_DEFAULTS.strafeMultiplier;
 
-  moveFn(level, state.player, forwardX + strafeX, forwardY + strafeY, state.keyOpen);
+  moveFn(level, state.player, forwardX + strafeX, forwardY + strafeY, state);
   state.isSprinting = sprinting;
 }

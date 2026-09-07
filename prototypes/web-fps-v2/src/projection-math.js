@@ -8,10 +8,11 @@ export function projectWorldPoint(state, canvas, worldX, worldY, fov = Math.PI /
   if (Math.abs(relative) > fov / 2) return null;
 
   const screenX = canvas.width * (0.5 + relative / fov);
-  const size = Math.min(canvas.height, 18000 / Math.max(1, distance));
+  const cameraDepth = distance * Math.cos(relative);
+  const size = Math.min(canvas.height, 18000 / Math.max(1, cameraDepth));
   const screenY = canvas.height * 0.5 - size * 0.35;
 
-  return { screenX, screenY, size, distance };
+  return { screenX, screenY, size, distance, cameraDepth, relative };
 }
 
 export function normalizeSigned(angle) {

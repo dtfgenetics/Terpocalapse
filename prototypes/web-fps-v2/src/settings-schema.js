@@ -9,5 +9,5 @@ export const SETTINGS_SCHEMA = {
   reducedMotion: { label: "Reduced Motion", type: "toggle", default: false },
   screenShake: { label: "Screen Shake", type: "toggle", default: true },
   flashingEffects: { label: "Flashing Effects", type: "toggle", default: true },
-  debugMiniMap: { label: "Debug Mini Map", type: "toggle", default: true }
+  debugMiniMap: { label: "Debug Mini Map", type: "toggle", default: false }
 };

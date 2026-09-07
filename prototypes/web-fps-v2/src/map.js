@@ -1,3 +1,5 @@
+import { gateIsOpen } from "./gate-map.js";
+
 export function getMapCell(level, x, y) {
   const tx = Math.floor(x / level.tileSize);
   const ty = Math.floor(y / level.tileSize);
@@ -17,15 +19,24 @@ export function tileKey(tx, ty) {
   return `${tx},${ty}`;
 }
 
-export function isSolid(level, x, y, keyOpen = false) {
+export function isSolid(level, x, y, state = null) {
   const cell = getMapCell(level, x, y);
-  return cell === "#" || (cell === "D" && !keyOpen);
+  if (cell === "#") return true;
+  if (cell !== "D") return false;
+
+  const tile = getTilePoint(level, x, y);
+  return !gateIsOpen(state?.gates || [], tile.tx, tile.ty);
 }
 
-export function safeMove(level, item, dx, dy, keyOpen = false) {
+export function safeMove(level, item, dx, dy, state = null) {
   const r = item.radius || 14;
   const nx = item.x + dx;
   const ny = item.y + dy;
-  if (!isSolid(level, nx - r, item.y, keyOpen) && !isSolid(level, nx + r, item.y, keyOpen)) item.x = nx;
-  if (!isSolid(level, item.x, ny - r, keyOpen) && !isSolid(level, item.x, ny + r, keyOpen)) item.y = ny;
+
+  if (!isSolid(level, nx - r, item.y, state) && !isSolid(level, nx + r, item.y, state)) {
+    item.x = nx;
+  }
+  if (!isSolid(level, item.x, ny - r, state) && !isSolid(level, item.x, ny + r, state)) {
+    item.y = ny;
+  }
 }
