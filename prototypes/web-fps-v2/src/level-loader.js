@@ -18,6 +18,14 @@ export function loadLevelByIndex(index = 0) {
   };
 }
 
+export function hasLevel(index) {
+  return Number.isInteger(index) && index >= 0 && index < MAP_REGISTRY.length;
+}
+
+export function levelCount() {
+  return MAP_REGISTRY.length;
+}
+
 export function normalizeMap(sourceMap) {
   const tileSize = sourceMap.tileSize || 64;
   const start = sourceMap.start || { x: 1.5, y: 1.5, angle: 0 };
