@@ -1,7 +1,7 @@
 import { STARTING_LOADOUT } from "./player-loadout.js";
 import { GEAR_BALANCE } from "./gear-balance.js";
 import { createLevelSession, createNextLevelSession } from "./level-session.js";
-import { createInitialState, startRun, updateClock } from "./state.js";
+import { createInitialState, resetRunState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { updatePlayerMovement } from "./movement-system.js";
 import { interact } from "./action-system.js";
@@ -180,6 +180,8 @@ function loadNextLevelOrFinish() {
     return;
   }
 
+  resetRunState(state);
+  keys.clear();
   session = nextSession;
   loadedLevel = session.loaded;
   LEVEL = session.level;
