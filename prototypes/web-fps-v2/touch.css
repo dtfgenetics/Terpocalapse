@@ -1,0 +1,121 @@
+.touch-controls {
+  position: fixed;
+  inset: auto max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  z-index: 5;
+  display: none;
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.touch-move,
+.touch-look,
+.touch-actions {
+  pointer-events: auto;
+}
+
+.touch-move {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 148px;
+  height: 148px;
+}
+
+.touch-look {
+  position: absolute;
+  right: 0;
+  bottom: 82px;
+  display: flex;
+  gap: 8px;
+}
+
+.touch-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 62px);
+  gap: 8px;
+}
+
+.touch-button {
+  min-width: 54px;
+  min-height: 54px;
+  padding: 0;
+  border: 1px solid rgba(124, 255, 91, 0.58);
+  border-radius: 14px;
+  background: rgba(5, 15, 8, 0.78);
+  color: #f0ffe9;
+  box-shadow: 0 6px 0 rgba(19, 56, 20, 0.78), inset 0 0 18px rgba(124, 255, 91, 0.08);
+  font-size: 0.7rem;
+  font-weight: 1000;
+  letter-spacing: 0.06em;
+  touch-action: none;
+  user-select: none;
+}
+
+.touch-button.is-active,
+.touch-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(19, 56, 20, 0.88), inset 0 0 20px rgba(255, 200, 87, 0.16);
+  border-color: #ffc857;
+  color: #ffc857;
+}
+
+.touch-up,
+.touch-left,
+.touch-down,
+.touch-right {
+  position: absolute;
+}
+
+.touch-up {
+  left: 47px;
+  top: 0;
+}
+
+.touch-left {
+  left: 0;
+  top: 47px;
+}
+
+.touch-down {
+  left: 47px;
+  top: 94px;
+}
+
+.touch-right {
+  left: 94px;
+  top: 47px;
+}
+
+.touch-fire {
+  grid-column: span 2;
+  min-width: 132px;
+}
+
+.touch-burst {
+  color: #dca2ff;
+  border-color: rgba(179, 107, 255, 0.7);
+}
+
+.touch-continue {
+  color: #ffc857;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .touch-controls {
+    display: block;
+  }
+}
+
+@media (max-width: 520px) {
+  .touch-actions {
+    grid-template-columns: repeat(2, 58px);
+  }
+
+  .touch-fire {
+    grid-column: span 2;
+    min-width: 124px;
+  }
+}
