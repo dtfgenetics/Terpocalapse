@@ -167,13 +167,25 @@ export function drawPickupSprite(ctx, pickup, x, y, size) {
     ctx.fillRect(-size * 0.18, -size * 0.04, size * 0.36, size * 0.2);
     ctx.fillStyle = "#333";
     ctx.fillRect(-size * 0.27, -size * 0.29, size * 0.54, size * 0.11);
-  } else if (pickup.id.includes("ammo_box")) {
+  } else if (pickup.id.includes("ammo_box") || pickup.id.includes("ammo_can") || pickup.id.includes("ammo_cache")) {
     ctx.fillStyle = pickup.color;
     ctx.fillRect(-size * 0.3, -size * 0.22, size * 0.6, size * 0.44);
     ctx.strokeRect(-size * 0.3, -size * 0.22, size * 0.6, size * 0.44);
     ctx.fillStyle = "#102016";
     ctx.fillRect(-size * 0.06, -size * 0.16, size * 0.12, size * 0.32);
     ctx.fillRect(-size * 0.16, -size * 0.06, size * 0.32, size * 0.12);
+    if (pickup.id.includes("ammo_can")) {
+      ctx.fillStyle = "#fff1d6";
+      ctx.fillRect(-size * 0.18, -size * 0.31, size * 0.36, size * 0.09);
+    }
+    if (pickup.id.includes("ammo_cache")) {
+      ctx.fillStyle = "#101610";
+      for (let i = 0; i < 3; i += 1) {
+        ctx.beginPath();
+        ctx.arc(-size * 0.16 + i * size * 0.16, -size * 0.02, size * 0.04, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
   } else if (pickup.id.startsWith("note_")) {
     ctx.fillStyle = "#e8f1df";
     ctx.fillRect(-size * 0.26, -size * 0.34, size * 0.52, size * 0.68);
