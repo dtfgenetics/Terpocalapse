@@ -1,6 +1,6 @@
 import { STARTING_LOADOUT } from "./player-loadout.js";
 import { GEAR_BALANCE } from "./gear-balance.js";
-import { createLevelSession } from "./level-session.js";
+import { createLevelSession, createNextLevelSession } from "./level-session.js";
 import { createInitialState, startRun, updateClock } from "./state.js";
 import { safeMove, getMapCell } from "./map.js";
 import { updatePlayerMovement } from "./movement-system.js";
@@ -14,7 +14,7 @@ import { createProgress, advanceProgress, setProgressAtLeast } from "./progress-
 import { createEffectState, pruneEffects } from "./effect-system.js";
 import { createSoundQueue, queueSound } from "./sound-queue.js";
 import { createSoundPlayer, playQueuedSounds } from "./sound-player.js";
-import { loadCampaignMemory, rememberScore } from "./campaign-memory.js";
+import { loadCampaignMemory, rememberLevelFinished } from "./campaign-memory.js";
 import { calculateScore } from "./score-calculator.js";
 import { canRunWorld, toggleRunPause } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
@@ -30,13 +30,13 @@ const startButton = document.getElementById("startButton");
 const touchControls = document.getElementById("touchControls");
 const gameHud = document.getElementById("gameHud");
 const ctx = canvas.getContext("2d");
-const session = createLevelSession(0);
-const loadedLevel = session.loaded;
-const LEVEL = session.level;
+let session = createLevelSession(0);
+let loadedLevel = session.loaded;
+let LEVEL = session.level;
 const state = createInitialState();
 const settings = loadSettings();
-const pickups = session.pickups;
-const threats = session.threats;
+let pickups = session.pickups;
+let threats = session.threats;
 const soundPlayer = createSoundPlayer(settings);
 const updateHud = bindHud(gameHud);
 const keys = new Set();
@@ -166,6 +166,40 @@ function advanceStoryPanel() {
     state.message = "Lore note saved.";
     return;
   }
+  if (state.storyPanel?.type === "ending") {
+    loadNextLevelOrFinish();
+  }
+}
+
+function loadNextLevelOrFinish() {
+  const nextSession = createNextLevelSession(session);
+  if (!nextSession) {
+    state.storyPanel = null;
+    state.mode = "complete";
+    state.message = "Episode complete. Seed Vault secured.";
+    return;
+  }
+
+  session = nextSession;
+  loadedLevel = session.loaded;
+  LEVEL = session.level;
+  pickups = session.pickups;
+  threats = session.threats;
+  state.keyOpen = false;
+  state.currentLevel = LEVEL.name;
+  state.story = loadedLevel.story;
+  state.spawnPlan = loadedLevel.spawnPlan;
+  state.pickups = pickups;
+  state.threats = threats;
+  state.gates = session.gates;
+  state.progress = createProgress(["Find the first supply pickup", "Collect route access", "Reach the exit chamber"]);
+  state.effects = createEffectState();
+  state.storyPanel = createBriefingPanel(LEVEL.name, loadedLevel.briefing);
+  state.pendingBriefing = state.storyPanel;
+  state.player.x = LEVEL.playerStart.x;
+  state.player.y = LEVEL.playerStart.y;
+  state.player.angle = LEVEL.playerStart.angle;
+  state.message = loadedLevel.briefing;
 }
 
 function update(dt, now) {
@@ -189,7 +223,7 @@ function update(dt, now) {
     setProgressAtLeast(state.progress, state.progress.labels.length);
     state.mode = "complete";
     queueSound(state.sounds, "level_complete");
-    rememberScore(state.memory, calculateScore(state));
+    rememberLevelFinished(state.memory, session.index, calculateScore(state));
     state.message = state.story?.exit || "Mission complete. The route is secured.";
     state.storyPanel = createEndingPanel();
   }
