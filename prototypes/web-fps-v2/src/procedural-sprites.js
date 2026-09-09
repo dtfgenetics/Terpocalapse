@@ -55,6 +55,79 @@ export function drawThreatSprite(ctx, threat, x, y, size) {
     ctx.fillStyle = "#8dff69";
     ctx.fillRect(size * 0.18, -size * 0.12, size * 0.32, size * 0.08);
     ctx.fillRect(size * 0.42, -size * 0.17, size * 0.08, size * 0.18);
+  } else if (threat.type === "root_rot_crawler") {
+    ctx.fillStyle = threat.color || "#7a5f45";
+    ctx.beginPath();
+    ctx.ellipse(0, size * 0.08, size * 0.34, size * 0.18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = "#352417";
+    for (let i = 0; i < 5; i += 1) {
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.18 + i * size * 0.09, -size * 0.02);
+      ctx.lineTo(-size * 0.34 + i * size * 0.16, -size * 0.34);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#101610";
+    ctx.fillRect(-size * 0.09, size * 0.02, size * 0.05, size * 0.04);
+    ctx.fillRect(size * 0.04, size * 0.02, size * 0.05, size * 0.04);
+  } else if (threat.type === "bud_rot_brute") {
+    ctx.fillStyle = threat.color || "#8a6f57";
+    ctx.fillRect(-size * 0.3, -size * 0.34, size * 0.6, size * 0.7);
+    ctx.strokeRect(-size * 0.3, -size * 0.34, size * 0.6, size * 0.7);
+    ctx.fillStyle = "#dfe7df";
+    ctx.beginPath();
+    ctx.arc(-size * 0.17, -size * 0.16, size * 0.08, 0, Math.PI * 2);
+    ctx.arc(size * 0.17, -size * 0.16, size * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#3d2f26";
+    ctx.fillRect(-size * 0.2, size * 0.1, size * 0.4, size * 0.08);
+  } else if (threat.type === "compliance_drone") {
+    ctx.fillStyle = threat.color || "#70c7ff";
+    ctx.fillRect(-size * 0.32, -size * 0.18, size * 0.64, size * 0.36);
+    ctx.strokeRect(-size * 0.32, -size * 0.18, size * 0.64, size * 0.36);
+    ctx.fillStyle = "#f0ffe9";
+    ctx.beginPath();
+    ctx.arc(0, -size * 0.02, size * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#70c7ff";
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.arc(side * size * 0.42, -size * 0.2, size * 0.11, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  } else if (threat.type === "aphid_queen") {
+    ctx.fillStyle = threat.color || "#b36bff";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size * 0.32, size * 0.38, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#e8d2ff";
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.2, -size * 0.34);
+    ctx.lineTo(0, -size * 0.56);
+    ctx.lineTo(size * 0.2, -size * 0.34);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#101610";
+    ctx.fillRect(-size * 0.12, -size * 0.08, size * 0.07, size * 0.05);
+    ctx.fillRect(size * 0.05, -size * 0.08, size * 0.07, size * 0.05);
+  } else if (threat.type === "mold_mother") {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.22)";
+    for (let i = 0; i < 10; i += 1) {
+      const angle = i * 0.628;
+      ctx.beginPath();
+      ctx.arc(Math.cos(angle) * size * 0.34, Math.sin(angle) * size * 0.34, size * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = threat.color || "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size * 0.34, size * 0.42, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#7cff5b";
+    ctx.fillRect(-size * 0.16, -size * 0.08, size * 0.08, size * 0.06);
+    ctx.fillRect(size * 0.08, -size * 0.08, size * 0.08, size * 0.06);
   } else {
     ctx.fillStyle = threat.color || "#ff8c2f";
     ctx.beginPath();
