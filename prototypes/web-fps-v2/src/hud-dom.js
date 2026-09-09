@@ -26,13 +26,19 @@ export function bindHud(root) {
     armor.textContent = String(Math.max(0, Math.round(state.player.armor || 0)));
     special.textContent = String(Math.max(0, Math.round(state.player.special || 0)));
     tool.textContent = label(toolId);
-    ammo.textContent = balance.ammo ? String(state.ammo?.[balance.ammo] || 0) : "∞";
+    ammo.textContent = ammoText(state, balance);
     score.textContent = String(state.player.score || 0);
     message.textContent = state.message || "";
 
     root.classList.toggle("is-danger", (state.player.hp || 0) <= 30);
     root.classList.toggle("is-complete", state.mode === "complete");
   };
+}
+
+function ammoText(state, balance) {
+  if (!balance.ammo) return "∞";
+  if (balance.ammo === "special") return String(Math.max(0, Math.round(state.player.special || 0)));
+  return String(state.ammo?.[balance.ammo] || 0);
 }
 
 function label(id) {
