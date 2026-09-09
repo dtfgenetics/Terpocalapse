@@ -10,8 +10,12 @@ const failures = [];
 for (const file of files) {
   const absolute = join(root, file);
   const source = readFileSync(absolute, "utf8");
-  const importMatches = source.matchAll(/from\s+["'](\.\.?\/[^"']+)["']/g);
-  for (const match of importMatches) {
+  const imports = [
+    ...source.matchAll(/from\s+["'](\.\.?\/[^"']+)["']/g),
+    ...source.matchAll(/import\s+["'](\.\.?\/[^"']+)["']/g)
+  ];
+
+  for (const match of imports) {
     const target = normalize(join(dirname(absolute), match[1]));
     const targetFile = target.endsWith(".js") ? target : `${target}.js`;
     if (!targetFile.startsWith(srcRoot) || !existsSync(targetFile)) {
