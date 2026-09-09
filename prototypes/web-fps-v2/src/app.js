@@ -9,6 +9,7 @@ import { findGateTiles } from "./gate-map.js";
 import { createPickups, collectNearbyPickups } from "./pickup-system.js";
 import { createThreats, updateThreats } from "./threat-system.js";
 import { createToolState, equipToolBySlot, useEquippedTool } from "./tool-system.js";
+import { soundForTool } from "./tool-sounds.js";
 import { activateSpecial } from "./special-system.js";
 import { createProgress, advanceProgress, setProgressAtLeast } from "./progress-system.js";
 import { createEffectState, pruneEffects } from "./effect-system.js";
@@ -114,7 +115,7 @@ function continueAction() {
 
 function fireTool() {
   if (!canRunWorld(state)) return;
-  queueSound(state.sounds, "tool_blaster");
+  queueSound(state.sounds, soundForTool(state.tools.equipped));
   useEquippedTool(state, LEVEL, threats);
 }
 
