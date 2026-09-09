@@ -14,7 +14,7 @@ import { createProgress, advanceProgress, setProgressAtLeast } from "./progress-
 import { createEffectState, pruneEffects } from "./effect-system.js";
 import { createSoundQueue, queueSound } from "./sound-queue.js";
 import { createSoundPlayer, playQueuedSounds } from "./sound-player.js";
-import { loadCampaignMemory, rememberLevelFinished } from "./campaign-memory.js";
+import { loadCampaignMemory, rememberLevelFinished, rememberLoreNote } from "./campaign-memory.js";
 import { calculateScore } from "./score-calculator.js";
 import { canRunWorld, toggleRunPause } from "./run-state.js";
 import { createIntroPanel, createBriefingPanel, createLorePanel, createEndingPanel } from "./story-ui.js";
@@ -214,7 +214,10 @@ function update(dt, now) {
     updateMissionProgressForPickup(collected);
   }
   if (collected?.id?.endsWith("keycard")) state.keyOpen = true;
-  if (collected?.id?.startsWith("note_")) state.storyPanel = createLorePanel(collected.id);
+  if (collected?.id?.startsWith("note_")) {
+    rememberLoreNote(state.memory, collected.id);
+    state.storyPanel = createLorePanel(collected.id);
+  }
 
   updateThreats(state, LEVEL, threats, dt, now);
 
