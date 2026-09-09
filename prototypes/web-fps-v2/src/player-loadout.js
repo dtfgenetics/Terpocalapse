@@ -9,8 +9,7 @@ export const STARTING_LOADOUT = {
     light: 24,
     heavy: 4,
     fuel: 0,
-    grenade: 0,
-    special: 1
+    grenade: 0
   },
   keys: {
     green: false,
