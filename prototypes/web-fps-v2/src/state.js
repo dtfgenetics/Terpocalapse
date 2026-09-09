@@ -20,12 +20,30 @@ export function createInitialState() {
       turningLeft: false,
       turningRight: false
     },
-    stats: {
-      shots: 0,
-      pickups: 0,
-      cleared: 0
-    }
+    stats: createFreshStats()
   };
+}
+
+export function createFreshStats() {
+  return {
+    shots: 0,
+    hits: 0,
+    pickups: 0,
+    cleared: 0
+  };
+}
+
+export function resetRunState(state) {
+  state.mode = "menu";
+  state.startedAt = 0;
+  state.elapsed = 0;
+  state.stats = createFreshStats();
+  state.hitConfirmUntil = 0;
+  state.damageFlashUntil = 0;
+  state.specialFlashUntil = 0;
+  state.lastHitAt = 0;
+  state.lastSpecialAt = 0;
+  return state;
 }
 
 export function startRun(state, now = performance.now()) {
