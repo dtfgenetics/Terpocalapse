@@ -73,7 +73,7 @@ export function useEquippedTool(state, level, threats, now = performance.now()) 
   return target;
 }
 
-export function findAimedThreat(state, level, threats, balance) {
+export function findAimedThreat(state, level, threats = [], balance) {
   const reach = balance.reach || 90;
   const aimCone = getAimCone(balance);
   let best = null;
@@ -108,6 +108,7 @@ function hasLineOfSight(state, level, angle, distance, targetRadius) {
 
 function getAimCone(balance) {
   if (!balance.ammo) return 0.62;
+  if (balance.ammo === "special") return 0.42;
   if ((balance.spread || 1) > 1) return 0.30;
   return 0.13;
 }
@@ -121,6 +122,15 @@ function normalizeAngle(angle) {
 
 function spendAmmo(state, ammoType) {
   state.ammo = state.ammo || {};
+
+  if (ammoType === "special") {
+    const cost = 35;
+    state.player.special = state.player.special ?? 0;
+    if (state.player.special < cost) return false;
+    state.player.special -= cost;
+    return true;
+  }
+
   state.ammo[ammoType] = state.ammo[ammoType] ?? 0;
   if (state.ammo[ammoType] <= 0) return false;
   state.ammo[ammoType] -= 1;
