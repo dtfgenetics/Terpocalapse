@@ -5,7 +5,12 @@ import { drawThreatSprite as drawProceduralThreat, drawPickupSprite } from "./pr
 const THREAT_ASSET_KEYS = Object.freeze({
   spider_mite_swarm: "enemy.spider_mite",
   powdery_mildew_ghoul: "enemy.mildew_ghoul",
-  nute_burn_sprayer: "enemy.nute_burn_sprayer"
+  nute_burn_sprayer: "enemy.nute_burn_sprayer",
+  root_rot_crawler: "enemy.root_rot_crawler",
+  bud_rot_brute: "enemy.bud_rot_brute",
+  compliance_drone: "enemy.compliance_drone",
+  aphid_queen: "enemy.aphid_queen",
+  mold_mother: "enemy.mold_mother"
 });
 
 export function drawThreatSprite(ctx, threat, x, y, size, now = performance.now()) {
