@@ -10,6 +10,7 @@
     "check:gear": "node tools/validate-v2-gear.mjs",
     "check:imports": "node tools/check-v2-imports.mjs",
     "check:dom": "node tools/check-v2-dom-contract.mjs",
+    "check:links": "node tools/check-v2-linked-files.mjs",
     "serve": "python3 -m http.server 5174"
   }
 }
