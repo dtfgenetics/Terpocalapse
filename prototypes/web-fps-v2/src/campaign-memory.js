@@ -19,3 +19,15 @@ export function rememberScore(memory, score) {
   memory.bestScore = Math.max(memory.bestScore || 0, score || 0);
   storeCampaignMemory(memory);
 }
+
+export function rememberLevelFinished(memory, levelIndex, score = 0) {
+  if (!memory.finished.includes(levelIndex)) memory.finished.push(levelIndex);
+  memory.unlocked = Math.max(memory.unlocked || 0, levelIndex + 1);
+  rememberScore(memory, score);
+}
+
+export function rememberLoreNote(memory, noteId) {
+  if (!noteId) return;
+  if (!memory.notes.includes(noteId)) memory.notes.push(noteId);
+  storeCampaignMemory(memory);
+}
