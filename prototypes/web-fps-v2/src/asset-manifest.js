@@ -11,6 +11,8 @@ export const ASSET_MANIFEST = Object.freeze({
     armor: sprite("pickup.kief_armor", "assets/pickups/kief-armor.png", ["idle"]),
     lightAmmo: sprite("pickup.light_ammo_box", "assets/pickups/light-ammo-box.png", ["idle"]),
     heavyAmmo: sprite("pickup.heavy_ammo_box", "assets/pickups/heavy-ammo-box.png", ["idle"]),
+    fuelAmmo: sprite("pickup.fuel_ammo_can", "assets/pickups/fuel-ammo-can.png", ["idle"]),
+    grenadeAmmo: sprite("pickup.grenade_ammo_cache", "assets/pickups/grenade-ammo-cache.png", ["idle"]),
     greenKey: sprite("pickup.green_keycard", "assets/pickups/green-keycard.png", ["idle"]),
     purpleKey: sprite("pickup.purple_keycard", "assets/pickups/purple-keycard.png", ["idle"]),
     goldKey: sprite("pickup.gold_keycard", "assets/pickups/gold-keycard.png", ["idle"]),
