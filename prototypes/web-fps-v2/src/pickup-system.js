@@ -9,6 +9,8 @@ export const PICKUP_COLORS = {
   kief_armor: "#ffc857",
   light_ammo_box: "#70c7ff",
   heavy_ammo_box: "#dca2ff",
+  fuel_ammo_can: "#ff8c2f",
+  grenade_ammo_cache: "#ffd166",
   grow_light_overdrive: "#ffffff",
   rare_seed_pack: "#9cff6e",
   golden_nug: "#ffd166",
@@ -17,6 +19,7 @@ export const PICKUP_COLORS = {
   co2_burst_rifle: "#70c7ff",
   terp_torch: "#ff8c2f",
   rosin_railgun: "#ffc857",
+  kief_grenades: "#ffd166",
   trichome_reaper: "#ffffff",
   lore_note: "#ffffff"
 };
@@ -24,12 +27,14 @@ export const PICKUP_COLORS = {
 const MARKER_PREFS = {
   K: ["green_keycard", "purple_keycard", "gold_keycard"],
   A: ["kief_armor"],
-  S: ["grow_light_overdrive", "rare_seed_pack", "golden_nug"]
+  S: ["grow_light_overdrive", "rare_seed_pack", "golden_nug", "fuel_ammo_can", "grenade_ammo_cache"]
 };
 
 const AMMO_PICKUPS = {
   light_ammo_box: { type: "light", amount: 24 },
-  heavy_ammo_box: { type: "heavy", amount: 8 }
+  heavy_ammo_box: { type: "heavy", amount: 8 },
+  fuel_ammo_can: { type: "fuel", amount: 40 },
+  grenade_ammo_cache: { type: "grenade", amount: 3 }
 };
 
 export function createPickups(level, spawnPlan) {
