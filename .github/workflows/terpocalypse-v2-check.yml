@@ -1,0 +1,29 @@
+name: Terpocalypse V2 Check
+
+on:
+  push:
+    paths:
+      - 'prototypes/web-fps-v2/**'
+      - '.github/workflows/terpocalypse-v2-check.yml'
+  pull_request:
+    paths:
+      - 'prototypes/web-fps-v2/**'
+      - '.github/workflows/terpocalypse-v2-check.yml'
+
+jobs:
+  check-v2:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prototypes/web-fps-v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run V2 checks
+        run: npm run check
