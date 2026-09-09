@@ -18,7 +18,12 @@ export function playQueuedSounds(player, queue) {
     if (!audio) continue;
     audio.volume = player.volume;
     audio.currentTime = 0;
-    audio.play?.().catch?.(() => {});
+    try {
+      const playResult = audio.play?.();
+      if (playResult && typeof playResult.catch === "function") playResult.catch(() => {});
+    } catch {
+      // Audio should never stop gameplay. Missing files/autoplay blocks are safe to ignore.
+    }
   }
 }
 
