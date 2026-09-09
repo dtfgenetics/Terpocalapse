@@ -105,6 +105,7 @@ startButton.addEventListener("click", () => {
   queueSound(state.sounds, "ui_continue");
   menu.classList.add("hidden");
   state.storyPanel = state.pendingBriefing;
+  updateTouchVisibility();
 });
 
 function continueAction() {
@@ -180,6 +181,7 @@ function loadNextLevelOrFinish() {
     state.storyPanel = null;
     state.mode = "complete";
     state.message = "Episode complete. Seed Vault secured.";
+    updateTouchVisibility();
     return;
   }
 
@@ -205,6 +207,7 @@ function loadNextLevelOrFinish() {
   state.player.y = LEVEL.playerStart.y;
   state.player.angle = LEVEL.playerStart.angle;
   state.message = loadedLevel.briefing;
+  updateTouchVisibility();
 }
 
 function update(dt, now) {
@@ -247,6 +250,11 @@ function updateMissionProgressForPickup(collected) {
   if (state.progress.current === 0) advanceProgress(state.progress);
 }
 
+function updateTouchVisibility() {
+  if (!touchControls) return;
+  touchControls.hidden = state.mode === "menu" && !state.storyPanel;
+}
+
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
@@ -254,9 +262,11 @@ function frame(now) {
   playQueuedSounds(soundPlayer, state.sounds);
   paint(ctx, canvas, state, LEVEL);
   updateHud(state);
+  updateTouchVisibility();
   requestAnimationFrame(frame);
 }
 
 fitCanvas(canvas);
 updateHud(state);
+updateTouchVisibility();
 requestAnimationFrame(frame);
