@@ -121,14 +121,14 @@ function fireTool() {
 
 function useAction() {
   if (!canRunWorld(state)) return;
-  queueSound(state.sounds, "route_access");
-  interact(state, LEVEL);
+  const result = interact(state, LEVEL);
+  queueSound(state.sounds, result === "door_open" || result === "exit" ? "route_access" : "ui_pause");
 }
 
 function specialAction() {
   if (!canRunWorld(state)) return;
-  queueSound(state.sounds, "special_burst");
-  activateSpecial(state, threats);
+  if (activateSpecial(state, threats)) queueSound(state.sounds, "special_burst");
+  else queueSound(state.sounds, "ui_pause");
 }
 
 function cycleTool() {
