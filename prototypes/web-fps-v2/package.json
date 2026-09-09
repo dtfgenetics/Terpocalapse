@@ -1,0 +1,15 @@
+{
+  "name": "terpocalypse-web-fps-v2",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:content": "node tools/validate-v2-content.mjs",
+    "check:routes": "node tools/check-v2-routes.mjs",
+    "check:refs": "node tools/validate-v2-references.mjs",
+    "check:gear": "node tools/validate-v2-gear.mjs",
+    "check:imports": "node tools/check-v2-imports.mjs",
+    "check:dom": "node tools/check-v2-dom-contract.mjs",
+    "serve": "python3 -m http.server 5174"
+  }
+}
