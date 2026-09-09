@@ -1,4 +1,4 @@
-import { loadLevelByIndex } from "./level-loader.js";
+import { loadLevelByIndex, hasLevel } from "./level-loader.js";
 import { createPickups } from "./pickup-system.js";
 import { createThreats } from "./threat-system.js";
 import { findGateTiles } from "./gate-map.js";
@@ -13,6 +13,15 @@ export function createLevelSession(index = 0) {
     threats: createThreats(loaded.level, loaded.spawnPlan),
     gates: findGateTiles(loaded.level)
   };
+}
+
+export function canCreateLevelSession(index) {
+  return hasLevel(index);
+}
+
+export function createNextLevelSession(session) {
+  const nextIndex = (session?.index || 0) + 1;
+  return canCreateLevelSession(nextIndex) ? createLevelSession(nextIndex) : null;
 }
 
 export function applyLevelSession(state, session) {
