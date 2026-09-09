@@ -115,8 +115,11 @@ function continueAction() {
 
 function fireTool() {
   if (!canRunWorld(state)) return;
-  queueSound(state.sounds, soundForTool(state.tools.equipped));
-  useEquippedTool(state, LEVEL, threats);
+  const beforeUse = state.tools.lastUseAt;
+  const target = useEquippedTool(state, LEVEL, threats);
+  if (state.tools.lastUseAt !== beforeUse) queueSound(state.sounds, soundForTool(state.tools.equipped));
+  else queueSound(state.sounds, "ui_pause");
+  return target;
 }
 
 function useAction() {
