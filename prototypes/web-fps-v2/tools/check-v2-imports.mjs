@@ -1,19 +1,14 @@
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, normalize } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, relative, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const srcRoot = join(root, "src");
-const files = ["src/app.js", "src/render.js", "src/wall-view.js", "src/depth-sampler.js", "src/action-system.js", "src/tool-system.js"];
+const files = collectJsFiles(srcRoot).map((file) => relative(root, file));
 const failures = [];
 
 for (const file of files) {
   const absolute = join(root, file);
-  if (!existsSync(absolute)) {
-    failures.push(`${file}: missing`);
-    continue;
-  }
-
   const source = readFileSync(absolute, "utf8");
   const importMatches = source.matchAll(/from\s+["'](\.\.?\/[^"']+)["']/g);
   for (const match of importMatches) {
@@ -30,5 +25,15 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log("V2 import check passed.");
+  console.log(`V2 import check passed for ${files.length} files.`);
+}
+
+function collectJsFiles(dir) {
+  const entries = readdirSync(dir).map((name) => join(dir, name));
+  const files = [];
+  for (const entry of entries) {
+    if (statSync(entry).isDirectory()) files.push(...collectJsFiles(entry));
+    else if (entry.endsWith(".js")) files.push(entry);
+  }
+  return files;
 }
