@@ -7,6 +7,10 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
+.touch-controls[hidden] {
+  display: none !important;
+}
+
 .touch-move,
 .touch-look,
 .touch-actions {
