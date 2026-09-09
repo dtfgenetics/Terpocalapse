@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check": "npm run check:content && npm run check:routes && npm run check:refs && npm run check:gear && npm run check:imports && npm run check:dom && npm run check:links",
     "check:content": "node tools/validate-v2-content.mjs",
     "check:routes": "node tools/check-v2-routes.mjs",
     "check:refs": "node tools/validate-v2-references.mjs",
