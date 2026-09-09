@@ -1,5 +1,6 @@
 import { ASSET_MANIFEST, listAssetEntries } from "../src/asset-manifest.js";
 import { GEAR_LIST } from "../src/gear-list.js";
+import { PICKUP_LIST } from "../src/pickup-list.js";
 import { THREAT_LIST } from "../src/threat-list.js";
 
 const failures = [];
@@ -15,6 +16,10 @@ for (const entry of entries) {
 
 for (const gear of GEAR_LIST) {
   if (!keys.has(`weapon.${gear.id}`)) failures.push(`${gear.id}: missing weapon asset entry`);
+}
+
+for (const pickup of PICKUP_LIST) {
+  if (!keys.has(`pickup.${pickup.id}`)) failures.push(`${pickup.id}: missing pickup asset entry`);
 }
 
 for (const threat of THREAT_LIST) {
