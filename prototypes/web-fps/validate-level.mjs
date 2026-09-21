@@ -82,10 +82,13 @@ assert.ok(openReach.has(`${exit.x},${exit.y}`), 'Extraction must become reachabl
 
 const indexHtml = await readFile(new URL('./index.html', import.meta.url), 'utf8');
 const mobileGameplayCss = await readFile(new URL('./mobile-gameplay-v2.css', import.meta.url), 'utf8');
+const mainJs = await readFile(new URL('./main.js', import.meta.url), 'utf8');
 assert.match(indexHtml, /\.\/mobile-gameplay-v2\.css/, 'V1 must load the mobile gameplay spacing layer');
 assert.match(mobileGameplayCss, /--terp-mobile-hud-reserve:\s*96px/, 'Mobile layout must reserve at least the 88px canvas HUD band plus spacing');
 assert.match(mobileGameplayCss, /\.touch-controls\s*\{[\s\S]*?bottom:\s*calc\(var\(--terp-mobile-hud-reserve\)/, 'Touch controls must sit above the reserved HUD band');
 assert.match(mobileGameplayCss, /\.toast\s*\{[\s\S]*?--terp-touch-stack-reserve/, 'Combat toasts must sit above the touch-control stack');
+assert.match(mainJs, /const mobileKey=player\.keys\.green\?"GREEN":"---"/, 'Compact mobile HUD must derive visible Green Key state');
+assert.match(mainJs, /hudText\(`KEY \$\{mobileKey\}`,135,height-h\+48/, 'Compact mobile HUD must render the key state in the reserved HUD band');
 
 console.log('Terpocalypse Veg Lab topology and mobile HUD layout validated:', {
   size: `${width}x${map.length}`,
