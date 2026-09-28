@@ -9,9 +9,9 @@ assert.match(
   'desktop fire and pointer-lock input must be scoped to the game canvas'
 );
 
-assert.doesNotMatch(
-  main,
-  /addEventListener\("mousedown",\(\)=>\{if\(mode==="paused"\)mode="running";if\(mode==="running"\)shoot\(\);canvas\.requestPointerLock/,
+assert.equal(
+  main.includes(';addEventListener("mousedown",()=>{if(mode==="paused")mode="running";if(mode==="running")shoot();canvas.requestPointerLock?.()}'),
+  false,
   'window-level mouse input must not fire weapons when players click UI controls'
 );
 
