@@ -15,4 +15,10 @@ assert.doesNotMatch(
   'window-level mouse input must not fire weapons when players click UI controls'
 );
 
+assert.match(
+  main,
+  /addEventListener\("keydown",e=>\{keysDown\.add\(e\.code\);if\(e\.repeat\)return;/,
+  'repeated keydown events must not retrigger pause, interact, special, or weapon-selection actions'
+);
+
 console.log('Terpocalypse V1 desktop input scope contract passed.');
