@@ -11,8 +11,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: terpocalypse-v2-pages
@@ -26,34 +24,17 @@ jobs:
         working-directory: prototypes/web-fps-v2
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Run checks
         run: npm run check
 
-  deploy:
-    needs: check
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload static build
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: prototypes/web-fps-v2
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Record canonical delivery boundary
+        run: |
+          echo "GitHub Pages deployment is intentionally retired."
+          echo "Terpocalypse is developed in this repository and packaged into the canonical DTFSeeds public suite."
