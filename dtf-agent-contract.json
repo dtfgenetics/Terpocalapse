@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "repository": "dtfgenetics/Terpocalapse",
+  "controlRepository": "dtfgenetics/Thc",
+  "defaultBranch": "main",
+  "canonicalDomains": [
+    "Terpocalypse game",
+    "Terpocalypse stable Veg Lab vertical slice",
+    "Terpocalypse original game assets"
+  ],
+  "sourceRoots": [
+    "prototypes/web-fps/",
+    "prototypes/web-fps-v2/",
+    "levels/",
+    "assets/",
+    "docs/",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "protectedPaths": [
+    ".github/workflows/**",
+    "assets/**"
+  ],
+  "verificationProfiles": {
+    "default": {
+      "commands": [
+        "node --check prototypes/web-fps/game-data.js",
+        "node --check prototypes/web-fps/main.js",
+        "node --check prototypes/web-fps/visibility-pause-v1.js",
+        "node prototypes/web-fps/validate-level.mjs"
+      ],
+      "ciAuthoritative": true
+    },
+    "stable-slice": {
+      "commands": [
+        "node --check prototypes/web-fps/game-data.js",
+        "node --check prototypes/web-fps/main.js",
+        "node --check prototypes/web-fps/visibility-pause-v1.js",
+        "node prototypes/web-fps/validate-level.mjs"
+      ],
+      "ciAuthoritative": true
+    }
+  },
+  "production": {
+    "directMutation": false,
+    "integrationOwner": "dtfgenetics/Thc",
+    "route": "/games/terpocalypse/",
+    "canonicalRuntimeRoot": "prototypes/web-fps/",
+    "notes": "V1 web-fps remains the stable canonical slice until V2 explicitly reaches parity. Integration snapshots in Thc are delivery outputs, not authoring sources."
+  }
+}
